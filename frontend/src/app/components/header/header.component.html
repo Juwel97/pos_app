@@ -1,0 +1,40 @@
+<header class="topbar">
+  <a class="brand" href="/jk_wellness/" aria-label="JK Wellness home">
+    <span class="brand-mark"><svg lucideArchive [size]="19" [strokeWidth]="2.4"></svg></span>
+    <span>JK Wellness</span>
+  </a>
+  <div class="nav-content">
+    <form class="search-form" role="search" (submit)="submitSearch($event)">
+      <svg lucideSearch class="search-leading" [size]="17"></svg>
+      <input
+        aria-label="Search items"
+        placeholder="Search items, serial number, batch number..."
+        name="searchText"
+        [(ngModel)]="searchText"
+      />
+      @if (searchText) {
+        <button
+          class="clear-search"
+          type="button"
+          aria-label="Clear search"
+          (click)="clearSearchText()"
+        >
+          <svg lucideX [size]="15"></svg>
+        </button>
+      }
+      <button class="search-submit" type="submit" aria-label="Search">
+        <svg lucideSearch [size]="17"></svg>
+      </button>
+    </form>
+  </div>
+  <button class="cart-button" type="button" aria-label="Open cart" (click)="cartClick.emit()">
+    <svg lucideShoppingCart [size]="19"></svg>
+    @if (cartCount()) {
+      <span class="cart-count">{{ cartCount() > 99 ? '99+' : cartCount() }}</span>
+    }
+  </button>
+  <div class="profile">
+    <span class="profile-avatar">S</span>
+    <span class="profile-name">Store admin</span>
+  </div>
+</header>

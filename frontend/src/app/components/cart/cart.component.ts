@@ -1,0 +1,112 @@
+import { CommonModule } from '@angular/common';
+import { Component, EventEmitter, Output, inject } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import {
+  LucideArrowLeft,
+  LucidePrinter,
+  LucideShoppingCart,
+  LucideTag,
+  LucideTrash2,
+  LucideX,
+} from '@lucide/angular';
+import { ReceiptComponent, ReceiptData } from '../receipt/receipt.component';
+import { CartItem, CartService } from '../../services/cart.service';
+
+@Component({
+  selector: 'app-cart',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    LucideArrowLeft,
+    LucidePrinter,
+    LucideShoppingCart,
+    LucideTag,
+    LucideTrash2,
+    LucideX,
+    ReceiptComponent,
+  ],
+  templateUrl: './cart.component.html',
+  styleUrl: './cart.component.css',
+})
+export class CartComponent {
+  @Output() readonly back = new EventEmitter<void>();
+  @Output() readonly notice = new EventEmitter<string>();
+  @Output() readonly checkoutComplete = new EventEmitter<void>();
+
+  readonly cart = inject(CartService);
+  readonly money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
+  discountDialogOpen = false;
+  discountDraft = '';
+  busy = false;
+  error = '';
+  receipt: ReceiptData | null = null;
+
+  get totalPrice(): number {
+    return this.cart.items().reduce((total, item) => total + item.unitPrice * item.quantity, 0);
+  }
+
+  get totalOfferPrice(): number {
+    return this.cart.items().reduce((total, item) => total + this.lineOfferTotal(item), 0);
+  }
+
+  lineOfferPrice(item: CartItem): number {
+    const offerPrice = item.unitPrice * (1 - this.cart.discountPercent() / 100);
+    return Math.round((offerPrice + Number.EPSILON) * 100) / 100;
+  }
+
+  lineOfferTotal(item: CartItem): number {
+    return this.lineOfferPrice(item) * item.quantity;
+  }
+
+  openDiscountDialog(): void {
+    this.discountDraft = '';
+    this.error = '';
+    this.discountDialogOpen = true;
+  }
+
+  applyDiscount(): void {
+    const discount = Number(this.discountDraft);
+    if (!/^\d{1,3}$/.test(this.discountDraft) || discount < 1 || discount > 100) {
+      this.error = 'Enter a whole number from 1 to 100.';
+      return;
+    }
+    this.cart.setDiscount(discount);
+    this.discountDialogOpen = false;
+    this.error = '';
+  }
+
+  async checkout(): Promise<void> {
+    if (this.busy || !this.cart.items().length) return;
+    this.busy = true;
+    this.error = '';
+    try {
+      const response = await fetch('/orders/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          discountPercent: this.cart.discountPercent(),
+          items: this.cart.items().map((item) => ({
+            itemId: Number(item.itemId),
+            quantity: item.quantity,
+          })),
+        }),
+      });
+      if (!response.ok) {
+        const body = (await response.json().catch(() => ({}))) as { error?: string };
+        throw new Error(body.error || `Checkout failed (${response.status})`);
+      }
+      this.receipt = (await response.json()) as ReceiptData;
+      this.cart.clear();
+      this.checkoutComplete.emit();
+    } catch (error) {
+      this.error = error instanceof Error ? error.message : 'Checkout could not be completed.';
+    } finally {
+      this.busy = false;
+    }
+  }
+
+  printReceipt(): void {
+    window.print();
+  }
+}

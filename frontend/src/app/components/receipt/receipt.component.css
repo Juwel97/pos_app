@@ -1,0 +1,147 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.receipt-print {
+  width: 100%;
+  padding: 25px 28px;
+  color: #202321;
+  background: #fff;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 11px;
+}
+
+.receipt-header {
+  text-align: center;
+}
+
+.receipt-header h1 {
+  margin: 0;
+  color: #1f342b;
+  font-family: Manrope, sans-serif;
+  font-size: 23px;
+  font-weight: 800;
+}
+
+.receipt-header p {
+  margin: 5px 0 0;
+  color: #555e59;
+  font-size: 10px;
+}
+
+.receipt-meta {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-top: 19px;
+  color: #404742;
+  font-size: 10px;
+}
+
+.receipt-meta time {
+  text-align: right;
+}
+
+.weekday {
+  display: block;
+  margin-top: 2px;
+  color: #717973;
+}
+
+.receipt-rule {
+  height: 0;
+  margin: 15px 0;
+  border: 0;
+  border-top: 1px solid #343b36;
+}
+
+.receipt-table-wrap {
+  overflow-x: auto;
+}
+
+.receipt-table {
+  width: 100%;
+  border-collapse: collapse;
+  table-layout: fixed;
+  font-size: 10px;
+}
+
+.receipt-table th,
+.receipt-table td {
+  padding: 8px 5px;
+  border-bottom: 1px solid #e6e9e6;
+  vertical-align: top;
+}
+
+.receipt-table thead th {
+  border-bottom: 1px solid #727a74;
+  color: #313a34;
+  font-weight: 700;
+}
+
+.receipt-table .serial-column {
+  width: 9%;
+  text-align: left;
+}
+
+.receipt-table .name-column {
+  width: 31%;
+  text-align: left;
+  overflow-wrap: anywhere;
+}
+
+.receipt-table .number-column {
+  width: 20%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+.receipt-table tfoot th,
+.receipt-table tfoot td {
+  padding-top: 11px;
+  border-bottom: 0;
+  color: #202923;
+  font-weight: 800;
+}
+
+.receipt-table tfoot th {
+  text-align: left;
+}
+
+.receipt-signature {
+  margin-top: 30px;
+  color: #515953;
+  font-size: 10px;
+}
+
+@media (max-width: 480px) {
+  .receipt-print {
+    padding: 20px 14px;
+  }
+
+  .receipt-header h1 {
+    font-size: 20px;
+  }
+
+  .receipt-table {
+    min-width: 440px;
+  }
+}
+
+@media print {
+  .receipt-print {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    padding: 12mm;
+    color: #111;
+    background: #fff;
+    font-family: Arial, sans-serif;
+  }
+
+  .receipt-table-wrap {
+    overflow: visible;
+  }
+}

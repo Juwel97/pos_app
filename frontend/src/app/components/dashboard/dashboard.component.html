@@ -1,0 +1,250 @@
+<app-header
+  (search)="submitSearch($event)"
+  (clearSearch)="clearSearch()"
+  (cartClick)="showCart = true"
+></app-header>
+
+@if (showCart) {
+  <app-cart
+    (back)="showCart = false"
+    (notice)="showNotice($event)"
+    (checkoutComplete)="refreshAfterCheckout()"
+  ></app-cart>
+} @else {
+  <main class="page-content">
+    <div class="page-heading">
+      <div>
+        <div class="eyebrow">INVENTORY MANAGEMENT</div>
+        <h1>Items</h1>
+        <p class="page-subtitle">Keep your products organized and your stock in check.</p>
+      </div>
+      <button class="primary-button" type="button" (click)="openModal('add')">
+        <svg lucideCirclePlus [size]="17"></svg> Add item
+      </button>
+    </div>
+
+    <section class="stats-grid" aria-label="Inventory summary">
+      <article class="stat-card">
+        <div class="stat-label">Total items</div>
+        <div class="stat-bottom">
+          <strong>{{ totalMedicineCount }}</strong>
+          <span class="stat-icon purple"><svg lucideArchive [size]="18"></svg></span>
+        </div>
+        <span class="stat-hint">In your inventory</span>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Inventory value</div>
+        <div class="stat-bottom">
+          <strong>{{ money.format(totalInventoryValue) }}</strong>
+          <span class="stat-icon mint">₹</span>
+        </div>
+        <span class="stat-hint">Based on current stock</span>
+      </article>
+      <article class="stat-card">
+        <div class="stat-label">Low stock</div>
+        <div class="stat-bottom">
+          <strong>{{ limitedStockCount }}</strong>
+          <span class="stat-icon amber"><span class="stock-dot"></span></span>
+        </div>
+        <span class="stat-hint">Fewer than 5 units</span>
+      </article>
+    </section>
+
+    <section class="inventory-card">
+      <div class="table-heading">
+        <div>
+          <h2>All items</h2>
+          <p>
+            @if (query) {
+              Showing results for <strong>“{{ query }}”</strong>
+            } @else {
+              A complete list of products in your store
+            }
+          </p>
+        </div>
+        <span class="count-pill">{{ totalItems }} {{ totalItems === 1 ? 'item' : 'items' }}</span>
+      </div>
+
+      @if (items.length) {
+        <div class="table-scroll">
+          <table>
+            <thead>
+              <tr>
+                <th>ITEM</th>
+                <th>SERIAL NUMBER</th>
+                <th>BATCH NUMBER</th>
+                <th>CATEGORY</th>
+                <th>PRICE</th>
+                <th>QUANTITY</th>
+                <th>EXPIRES</th>
+                <th>STATUS</th>
+                <th><span class="sr-only">Actions</span></th>
+              </tr>
+            </thead>
+            <tbody>
+              @for (item of items; track item.id) {
+                <tr>
+                  <td>
+                    <div class="item-cell">
+                      <span class="item-thumb">{{ item.name.slice(0, 1).toUpperCase() }}</span>
+                      <div>
+                        <strong>{{ item.name }}</strong>
+                        <span>{{ item.description || '—' }}</span>
+                      </div>
+                    </div>
+                  </td>
+                  <td>
+                    <span class="sku">{{ item.serialNumber }}</span>
+                  </td>
+                  <td>
+                    @if (item.batchNumber) {
+                      {{ item.batchNumber }}
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    @if (item.category) {
+                      {{ item.category }}
+                    } @else {
+                      <span class="muted">Uncategorized</span>
+                    }
+                  </td>
+                  <td class="price-cell">{{ formatPrice(item.price) }}</td>
+                  <td>{{ item.quantity }}</td>
+                  <td>
+                    @if (item.expireDate) {
+                      <time [attr.datetime]="item.expireDate">{{ item.expireDate }}</time>
+                    } @else {
+                      <span class="muted">—</span>
+                    }
+                  </td>
+                  <td>
+                    <span
+                      class="status"
+                      [class.out]="item.quantity === 0"
+                      [class.low]="item.quantity > 0 && item.quantity <= 5"
+                      [class.in]="item.quantity > 5"
+                    >
+                      <i></i>
+                      {{
+                        item.quantity === 0
+                          ? 'Out of stock'
+                          : item.quantity <= 5
+                            ? 'Low stock'
+                            : 'In stock'
+                      }}
+                    </span>
+                  </td>
+                  <td>
+                    <div class="row-actions">
+                      <button
+                        type="button"
+                        title="Add to cart"
+                        [attr.aria-label]="'Add ' + item.name + ' to cart'"
+                        [disabled]="item.quantity < 1"
+                        (click)="addToCart(item)"
+                      >
+                        <svg lucideShoppingCart [size]="16"></svg>
+                      </button>
+                      <button
+                        type="button"
+                        title="Update item"
+                        [attr.aria-label]="'Update ' + item.name"
+                        (click)="openModal('update', item)"
+                      >
+                        <svg lucidePencil [size]="16"></svg>
+                      </button>
+                      <button
+                        type="button"
+                        class="delete-action"
+                        title="Delete item"
+                        [attr.aria-label]="'Delete ' + item.name"
+                        (click)="deleteItem(item)"
+                      >
+                        <svg lucideTrash2 [size]="16"></svg>
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      } @else {
+        <div class="empty-state">
+          <span class="empty-icon"><svg lucideArchive [size]="23"></svg></span>
+          <h3>{{ query ? 'No matching items' : 'Your inventory is ready' }}</h3>
+          <p>
+            {{
+              query
+                ? 'Try another name, serial number, batch number, or category.'
+                : 'Add your first item to start tracking your products.'
+            }}
+          </p>
+          @if (!query) {
+            <button class="primary-button" type="button" (click)="openModal('add')">
+              <svg lucideCirclePlus [size]="17"></svg> Add your first item
+            </button>
+          }
+        </div>
+      }
+
+      <div class="table-footer">
+        <span>
+          Showing <strong>{{ items.length }}</strong> of <strong>{{ totalItems }}</strong>
+          {{ totalItems === 1 ? 'item' : 'items' }}
+        </span>
+        <div style="display: flex; align-items: center; gap: 12px">
+          <button
+            type="button"
+            style="
+              border: 1px solid #ececf2;
+              background: #fff;
+              color: #2d2f45;
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-weight: 600;
+            "
+            [style.opacity]="hasPrev ? 1 : 0.45"
+            [style.cursor]="hasPrev ? 'pointer' : 'not-allowed'"
+            (click)="loadItems(query, page - 1)"
+            [disabled]="!hasPrev"
+          >
+            Prev
+          </button>
+          <span style="font-size: 12px; color: #898da0; font-weight: 600">
+            Page {{ displayedPage }} / {{ displayedTotalPages }}
+          </span>
+          <button
+            type="button"
+            style="
+              border: 1px solid #ececf2;
+              background: #fff;
+              color: #2d2f45;
+              border-radius: 8px;
+              padding: 6px 12px;
+              font-weight: 600;
+            "
+            [style.opacity]="hasNext ? 1 : 0.45"
+            [style.cursor]="hasNext ? 'pointer' : 'not-allowed'"
+            (click)="loadItems(query, page + 1)"
+            [disabled]="!hasNext"
+          >
+            Next
+          </button>
+        </div>
+      </div>
+    </section>
+
+    @if (modal; as activeModal) {
+      <app-item-form
+        [mode]="activeModal.type"
+        [item]="activeModal.item"
+        [busy]="busy"
+        (save)="submitForm($event)"
+        (cancel)="modal = null"
+      ></app-item-form>
+    }
+  </main>
+}

@@ -1,0 +1,33 @@
+# Maven build output
+/target/
+*.class
+*.jar
+*.war
+
+# Angular dependencies, caches, and build output
+frontend/node_modules/
+frontend/dist/
+frontend/.angular/
+frontend/.vite/
+frontend/coverage/
+frontend/*.tsbuildinfo
+
+# Generated Angular bundle copied into Spring Boot resources
+/src/main/resources/static/jk_wellness/
+
+# Local environment and logs
+*.log
+.env
+.env.*
+!.env.example
+!.env.sample
+
+# IDE and operating system files
+/.idea/
+/.vscode/
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Accidental root npm lockfile (the app lockfile is frontend/package-lock.json)
+/package-lock.json

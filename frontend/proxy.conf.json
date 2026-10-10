@@ -1,0 +1,14 @@
+{
+  "/item": {
+    "target": "http://localhost:8080",
+    "secure": false
+  },
+  "/analysis": {
+    "target": "http://localhost:8080",
+    "secure": false
+  },
+  "/orders": {
+    "target": "http://localhost:8080",
+    "secure": false
+  }
+}

@@ -1,0 +1,12 @@
+spring:
+  datasource:
+    url: "${DATABASE_URL:jdbc:postgresql://localhost:5432/pos_app}"
+    username: "${DATABASE_USERNAME:postgres}"
+    password: "${DATABASE_PASSWORD:postgres}"
+    driver-class-name: "org.postgresql.Driver"
+  h2:
+    console:
+      enabled: "false"
+  sql:
+    init:
+      mode: "always"

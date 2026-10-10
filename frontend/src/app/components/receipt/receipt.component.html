@@ -1,0 +1,55 @@
+<article class="receipt-print" aria-label="Customer receipt">
+  <header class="receipt-header">
+    <h1>J K Wellness Pharmacy</h1>
+    <p>Kharibuna, Bhawagwanagola, Murshidabad, WB, Pin-742134</p>
+  </header>
+
+  <div class="receipt-meta">
+    <span>Order #{{ receipt.orderId }}</span>
+    <time [attr.datetime]="receipt.createdAt">
+      {{ receipt.createdAt | date: 'dd-MM-yyyy HH:mm:ss' }}
+      <span class="weekday">{{ receipt.createdAt | date: 'EEEE' }}</span>
+    </time>
+  </div>
+
+  <hr class="receipt-rule" />
+
+  <div class="receipt-table-wrap">
+    <table class="receipt-table">
+      <thead>
+        <tr>
+          <th class="serial-column">Sl no</th>
+          <th class="name-column">Item name</th>
+          <th class="number-column">Quantity</th>
+          <th class="number-column">Price</th>
+          <th class="number-column">Offer price</th>
+        </tr>
+      </thead>
+      <tbody>
+        @for (item of receipt.items; track item.itemId; let index = $index) {
+          <tr>
+            <td class="serial-column">{{ index + 1 }}</td>
+            <td class="name-column">{{ item.itemName }}</td>
+            <td class="number-column">{{ item.quantity }}</td>
+            <td class="number-column">{{ money.format(item.lineTotal) }}</td>
+            <td class="number-column">{{ money.format(item.lineOfferTotal) }}</td>
+          </tr>
+        }
+      </tbody>
+      <tfoot>
+        <tr>
+          <th colspan="2">Total</th>
+          <td class="number-column">{{ receipt.totalQuantity }}</td>
+          <td class="number-column">{{ money.format(receipt.totalPrice) }}</td>
+          <td class="number-column">{{ money.format(receipt.totalOfferPrice) }}</td>
+        </tr>
+      </tfoot>
+    </table>
+  </div>
+
+  <hr class="receipt-rule" />
+
+  <div class="receipt-signature">
+    <span>Signature</span>
+  </div>
+</article>

@@ -1,0 +1,28 @@
+.app-shell {
+  min-height: 100vh;
+}
+
+.toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  z-index: 20;
+  max-width: min(400px, calc(100vw - 32px));
+  background: #292a3d;
+  color: #fff;
+  padding: 12px 13px 12px 16px;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px #22253830;
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  font-size: 12px;
+}
+
+.toast button {
+  border: 0;
+  background: transparent;
+  color: #d0d0db;
+  display: grid;
+  place-items: center;
+}

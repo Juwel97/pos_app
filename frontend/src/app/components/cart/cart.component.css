@@ -1,0 +1,395 @@
+.page-content {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 43px 32px 28px;
+}
+
+.page-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 25px;
+}
+
+.eyebrow {
+  color: #9294a3;
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.page-heading h1 {
+  margin: 5px 0;
+  color: #25263a;
+  font:
+    800 30px Manrope,
+    sans-serif;
+}
+
+.page-subtitle {
+  margin: 0;
+  color: #85889a;
+  font-size: 13px;
+}
+
+.back-button,
+.discount-button,
+.checkout-button,
+.cancel-button {
+  min-height: 39px;
+  padding: 0 14px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  border-radius: 7px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.back-button,
+.discount-button,
+.cancel-button {
+  border: 1px solid #e5e6eb;
+  background: #fff;
+  color: #535668;
+}
+
+.back-button:hover,
+.discount-button:hover,
+.cancel-button:hover {
+  background: #f7f7f9;
+}
+
+.cart-panel {
+  overflow: hidden;
+  border: 1px solid #e9e9ee;
+  border-radius: 8px;
+  background: #fff;
+}
+
+.cart-table-scroll {
+  overflow-x: auto;
+}
+
+.cart-table {
+  width: 100%;
+  min-width: 650px;
+  border-collapse: collapse;
+}
+
+.cart-table thead {
+  background: #f8f9fa;
+}
+
+.cart-table th {
+  height: 42px;
+  padding: 0 16px;
+  border-bottom: 1px solid #ececf0;
+  color: #888a98;
+  font-size: 10px;
+  font-weight: 700;
+  text-align: left;
+}
+
+.cart-table td {
+  height: 66px;
+  padding: 10px 16px;
+  border-bottom: 1px solid #f0f0f3;
+  color: #5c5e6c;
+  font-size: 12px;
+  white-space: nowrap;
+}
+
+.cart-table .serial-cell {
+  color: #9698a4;
+  width: 72px;
+}
+
+.name-cell strong,
+.name-cell span {
+  display: block;
+}
+
+.name-cell strong {
+  color: #343645;
+  font-size: 12px;
+}
+
+.name-cell span {
+  margin-top: 4px;
+  color: #999aa6;
+  font-size: 10px;
+}
+
+.quantity-input {
+  width: 70px;
+  height: 32px;
+  padding: 0 8px;
+  border: 1px solid #e5e5eb;
+  border-radius: 6px;
+  color: #3e4050;
+  text-align: center;
+}
+
+.offer-cell,
+.cart-table tfoot .total-offer {
+  color: #258b68;
+  font-weight: 700;
+}
+
+.remove-button,
+.icon-button {
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #9294a0;
+}
+
+.remove-button:hover {
+  background: #fff0f1;
+  color: #d75b69;
+}
+
+.cart-table tfoot th,
+.cart-table tfoot td {
+  height: 54px;
+  border-top: 1px solid #e7e7ec;
+  border-bottom: 0;
+  background: #fbfbfc;
+  color: #343645;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cart-table tfoot th {
+  text-align: right;
+}
+
+.cart-actions {
+  min-height: 75px;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  border-top: 1px solid #ededf1;
+}
+
+.discount-summary {
+  color: #858794;
+  font-size: 11px;
+}
+
+.discount-applied {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #32866c;
+  font-weight: 600;
+}
+
+.action-buttons,
+.dialog-actions,
+.receipt-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 9px;
+}
+
+.checkout-button {
+  border: 1px solid #285e4d;
+  background: #2f745d;
+  color: white;
+}
+
+.checkout-button:hover {
+  background: #285e4d;
+}
+
+.checkout-button:disabled {
+  opacity: 0.65;
+  cursor: wait;
+}
+
+.cart-empty {
+  min-height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  border-top: 1px solid #e9e9ee;
+  text-align: center;
+}
+
+.empty-mark {
+  width: 50px;
+  height: 50px;
+  display: grid;
+  place-items: center;
+  border-radius: 9px;
+  background: #edf4f1;
+  color: #34775f;
+}
+
+.cart-empty h2 {
+  margin: 15px 0 5px;
+  color: #303240;
+  font:
+    700 17px Manrope,
+    sans-serif;
+}
+
+.cart-empty p {
+  margin: 0 0 17px;
+  color: #8b8d99;
+  font-size: 12px;
+}
+
+.cart-error {
+  margin: 0;
+  padding: 10px 18px;
+  background: #fff3f2;
+  color: #bd4e51;
+  font-size: 12px;
+}
+
+.dialog-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 20;
+  display: grid;
+  place-items: center;
+  padding: 20px;
+  background: #20223670;
+}
+
+.dialog,
+.receipt-dialog {
+  width: min(450px, 100%);
+  max-height: calc(100vh - 40px);
+  overflow: auto;
+  border-radius: 9px;
+  background: #fff;
+  box-shadow: 0 20px 60px #191a2b42;
+}
+
+.dialog {
+  padding: 23px;
+}
+
+.dialog-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.dialog-heading h2,
+.discount-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+  color: #555766;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.percent-input {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  border: 1px solid #e5e5eb;
+  border-radius: 6px;
+  cursor: text;
+}
+
+.percent-input input {
+  flex: 1 1 auto;
+  width: 0;
+  min-width: 0;
+  height: 39px;
+  padding: 0 11px;
+  border: 0;
+  outline: none;
+  background: transparent;
+}
+
+.percent-input > span {
+  padding: 0 12px;
+  color: #888a98;
+  pointer-events: none;
+  user-select: none;
+}
+
+.dialog-hint {
+  margin: 8px 0 18px;
+  color: #91939f;
+  font-size: 11px;
+}
+
+.dialog-actions {
+  margin-top: 16px;
+}
+
+.receipt-dialog {
+  width: min(520px, 100%);
+  padding: 24px;
+}
+
+.receipt-actions {
+  margin-top: 18px;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@media (max-width: 620px) {
+  .page-content {
+    padding: 27px 14px 18px;
+  }
+
+  .page-heading {
+    align-items: flex-start;
+    gap: 14px;
+  }
+
+  .page-heading h1 {
+    font-size: 26px;
+  }
+
+  .page-subtitle {
+    max-width: 240px;
+    line-height: 1.5;
+  }
+
+  .back-button {
+    padding: 0 9px;
+    white-space: nowrap;
+  }
+
+  .cart-actions {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .action-buttons {
+    width: 100%;
+  }
+
+  .action-buttons button {
+    flex: 1;
+  }
+}

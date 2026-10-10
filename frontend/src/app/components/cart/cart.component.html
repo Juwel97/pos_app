@@ -1,0 +1,184 @@
+<main class="page-content cart-view">
+  <div class="page-heading">
+    <div>
+      <div class="eyebrow">CHECKOUT</div>
+      <h1>Cart</h1>
+      <p class="page-subtitle">Review quantities and pricing before completing this sale.</p>
+    </div>
+    <button class="back-button" type="button" (click)="back.emit()">
+      <svg lucideArrowLeft [size]="16"></svg> Back to items
+    </button>
+  </div>
+
+  @if (cart.items().length) {
+    <section class="cart-panel" aria-label="Cart items">
+      <div class="cart-table-scroll">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>SL NO</th>
+              <th>ITEM NAME</th>
+              <th>ITEM QUANTITY</th>
+              <th>PRICE</th>
+              <th>OFFER PRICE</th>
+              <th><span class="sr-only">Remove</span></th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (item of cart.items(); track item.itemId; let index = $index) {
+              <tr>
+                <td class="serial-cell">{{ index + 1 }}</td>
+                <td class="name-cell">
+                  <strong>{{ item.name }}</strong>
+                  <span>{{ item.stock }} available</span>
+                </td>
+                <td>
+                  <input
+                    class="quantity-input"
+                    type="number"
+                    min="1"
+                    [max]="item.stock"
+                    [ngModel]="item.quantity"
+                    (ngModelChange)="cart.setQuantity(item.itemId, $event)"
+                    [name]="'quantity-' + item.itemId"
+                    [attr.aria-label]="'Quantity for ' + item.name"
+                  />
+                </td>
+                <td>{{ money.format(item.unitPrice) }}</td>
+                <td class="offer-cell">{{ money.format(lineOfferPrice(item)) }}</td>
+                <td>
+                  <button
+                    class="remove-button"
+                    type="button"
+                    [attr.aria-label]="'Remove ' + item.name"
+                    title="Remove item"
+                    (click)="cart.remove(item.itemId)"
+                  >
+                    <svg lucideTrash2 [size]="16"></svg>
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+          <tfoot>
+            <tr>
+              <th colspan="2">Total</th>
+              <td class="total-quantity">{{ cart.totalQuantity() }}</td>
+              <td class="total-price">{{ money.format(totalPrice) }}</td>
+              <td class="total-offer">{{ money.format(totalOfferPrice) }}</td>
+              <td></td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div class="cart-actions">
+        <div class="discount-summary">
+          @if (cart.discountPercent()) {
+            <span class="discount-applied"
+              ><svg lucideTag [size]="14"></svg> {{ cart.discountPercent() }}% discount
+              applied</span
+            >
+          } @else {
+            <span>No discount applied</span>
+          }
+        </div>
+        <div class="action-buttons">
+          <button class="discount-button" type="button" (click)="openDiscountDialog()">
+            <svg lucideTag [size]="16"></svg> Discount
+          </button>
+          <button class="checkout-button" type="button" [disabled]="busy" (click)="checkout()">
+            @if (busy) {
+              Saving order...
+            } @else {
+              Checkout
+            }
+          </button>
+        </div>
+      </div>
+      @if (error) {
+        <p class="cart-error" role="alert">{{ error }}</p>
+      }
+    </section>
+  } @else if (!receipt) {
+    <section class="cart-empty">
+      <div class="empty-mark"><svg lucideShoppingCart [size]="25"></svg></div>
+      <h2>Your cart is empty</h2>
+      <p>Add products from the inventory to start an order.</p>
+      <button class="checkout-button" type="button" (click)="back.emit()">Browse items</button>
+    </section>
+  }
+
+  @if (discountDialogOpen) {
+    <div
+      class="dialog-backdrop"
+      (mousedown)="$event.target === $event.currentTarget && (discountDialogOpen = false)"
+    >
+      <section class="dialog" role="dialog" aria-modal="true" aria-labelledby="discount-title">
+        <div class="dialog-heading">
+          <div>
+            <span class="eyebrow">ORDER ADJUSTMENT</span>
+            <h2 id="discount-title">Apply a discount</h2>
+          </div>
+          <button
+            class="icon-button"
+            type="button"
+            aria-label="Close"
+            (click)="discountDialogOpen = false"
+          >
+            <svg lucideX [size]="18"></svg>
+          </button>
+        </div>
+        <form (ngSubmit)="applyDiscount()">
+          <label class="discount-field">
+            Discount percentage
+            <span class="percent-input" (pointerdown)="discountInput.focus()">
+              <input
+                #discountInput
+                type="text"
+                name="discount"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                maxlength="3"
+                placeholder="1-100"
+                required
+                [(ngModel)]="discountDraft"
+              />
+              <span>%</span>
+            </span>
+          </label>
+          <p class="dialog-hint">The discount applies to every item in this order.</p>
+          @if (error) {
+            <p class="cart-error" role="alert">{{ error }}</p>
+          }
+          <div class="dialog-actions">
+            <button class="cancel-button" type="button" (click)="discountDialogOpen = false">
+              Cancel
+            </button>
+            <button class="checkout-button" type="submit">Apply discount</button>
+          </div>
+        </form>
+      </section>
+    </div>
+  }
+
+  @if (receipt; as order) {
+    <div class="dialog-backdrop receipt-backdrop">
+      <section
+        class="receipt-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="receipt-title"
+      >
+        <app-receipt [receipt]="order"></app-receipt>
+        <div class="receipt-actions">
+          <button class="cancel-button" type="button" (click)="receipt = null; back.emit()">
+            Back to items
+          </button>
+          <button class="checkout-button" type="button" (click)="printReceipt()">
+            <svg lucidePrinter [size]="16"></svg> Print receipt
+          </button>
+        </div>
+      </section>
+    </div>
+  }
+</main>

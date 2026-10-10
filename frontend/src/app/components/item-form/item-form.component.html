@@ -1,0 +1,120 @@
+<div class="modal-backdrop" (mousedown)="closeOnBackdrop($event)">
+  <section class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-heading">
+      <div>
+        <span class="eyebrow">INVENTORY</span>
+        <h2 id="modal-title">
+          @if (mode === 'add') {
+            Add a new item
+          } @else {
+            Update item
+          }
+        </h2>
+        <p>
+          @if (mode === 'add') {
+            Fill in the details to add a product.
+          } @else {
+            Editing {{ item?.name }}
+          }
+        </p>
+      </div>
+      <button class="modal-close" type="button" aria-label="Close dialog" (click)="cancel.emit()">
+        <svg lucideX [size]="19"></svg>
+      </button>
+    </div>
+
+    <form class="item-form" (ngSubmit)="submit()">
+      <label>
+        Item name
+        <input
+          required
+          maxlength="120"
+          placeholder="e.g. Paracetamol 500mg"
+          name="name"
+          [(ngModel)]="form.name"
+        />
+      </label>
+      <div class="form-row">
+        <label>
+          Serial number
+          <input
+            required
+            maxlength="60"
+            placeholder="Enter serial number"
+            name="serialNumber"
+            [(ngModel)]="form.serialNumber"
+          />
+        </label>
+        <label>
+          Batch number
+          <input
+            maxlength="60"
+            placeholder="Enter batch number"
+            name="batchNumber"
+            [(ngModel)]="form.batchNumber"
+          />
+        </label>
+      </div>
+      <label>
+        Category
+        <input
+          maxlength="80"
+          placeholder="e.g. Prescription"
+          name="category"
+          [(ngModel)]="form.category"
+        />
+      </label>
+      <div class="form-row">
+        <label>
+          Price
+          <div class="input-prefix">
+            <span>₹</span>
+            <input
+              required
+              type="number"
+              min="0"
+              step="0.01"
+              placeholder="0.00"
+              name="price"
+              [ngModel]="form.price"
+              (ngModelChange)="form.price = $event.toString()"
+            />
+          </div>
+        </label>
+        <label>
+          Quantity
+          <input
+            required
+            type="number"
+            min="0"
+            step="1"
+            placeholder="0"
+            name="quantity"
+            [ngModel]="form.quantity"
+            (ngModelChange)="form.quantity = $event.toString()"
+          />
+        </label>
+      </div>
+      <label>
+        Expiration date
+        <input type="date" name="expireDate" [(ngModel)]="form.expireDate" />
+      </label>
+      <label>
+        Description
+        <textarea
+          maxlength="500"
+          rows="3"
+          placeholder="A short note about this item..."
+          name="description"
+          [(ngModel)]="form.description"
+        ></textarea>
+      </label>
+      <div class="form-actions">
+        <button type="button" class="secondary-button" (click)="cancel.emit()">Cancel</button>
+        <button class="primary-button" type="submit" [disabled]="busy">
+          {{ busy ? 'Saving...' : mode === 'add' ? 'Add item' : 'Save changes' }}
+        </button>
+      </div>
+    </form>
+  </section>
+</div>
