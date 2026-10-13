@@ -143,14 +143,18 @@ export class DashboardComponent implements OnInit {
       this.showNotice('This item is out of stock.');
       return;
     }
-    this.cart.add({
+    const maximumReached = this.cart.add({
       itemId: item.id,
       name: item.name,
       quantity: 1,
       stock: item.quantity,
       unitPrice: Number(item.price),
     });
-    this.showNotice(`${item.name} added to cart.`);
+    this.showNotice(
+      maximumReached
+        ? `You have reached the maximum quantity of ${item.quantity} for ${item.name}.`
+        : `${item.name} added to cart.`,
+    );
   }
 
   async refreshAfterCheckout(): Promise<void> {
@@ -161,6 +165,7 @@ export class DashboardComponent implements OnInit {
 
   async submitForm(form: ItemFormData): Promise<void> {
     if (!this.modal) return;
+    const pageToLoad = this.modal.type === 'update' ? this.page : 0;
     this.busy = true;
     const payload: ItemWriteRequest = {
       ...form,
@@ -176,7 +181,7 @@ export class DashboardComponent implements OnInit {
         this.showNotice('Item details updated.');
       }
       this.modal = null;
-      await this.loadItems(this.query, 0);
+      await this.loadItems(this.query, pageToLoad);
       await this.loadAnalysis();
     } catch (error) {
       this.showNotice(this.errorMessage(error));

@@ -1,10 +1,10 @@
 <div class="app-shell">
   <app-dashboard (notice)="showNotice($event)" />
   <app-footer />
-  @if (notice) {
+  @if (notice(); as message) {
     <div class="toast" role="status">
-      {{ notice }}
-      <button aria-label="Dismiss message" (click)="notice = ''">
+      {{ message }}
+      <button aria-label="Dismiss message" (click)="dismissNotice()">
         <svg lucideX [size]="15"></svg>
       </button>
     </div>

@@ -1,4 +1,4 @@
-import { Component, OnDestroy } from '@angular/core';
+import { Component, OnDestroy, signal } from '@angular/core';
 import { LucideX } from '@lucide/angular';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
 import { FooterComponent } from './components/footer/footer.component';
@@ -11,16 +11,24 @@ import { FooterComponent } from './components/footer/footer.component';
   styleUrl: './app.component.css',
 })
 export class AppComponent implements OnDestroy {
-  notice = '';
+  readonly notice = signal('');
   private noticeTimer: number | undefined;
 
   showNotice(message: string): void {
-    this.notice = message;
+    this.notice.set(message);
     if (this.noticeTimer !== undefined) window.clearTimeout(this.noticeTimer);
     this.noticeTimer = window.setTimeout(() => {
-      this.notice = '';
+      this.notice.set('');
       this.noticeTimer = undefined;
-    }, 3600);
+    }, 2000);
+  }
+
+  dismissNotice(): void {
+    this.notice.set('');
+    if (this.noticeTimer !== undefined) {
+      window.clearTimeout(this.noticeTimer);
+      this.noticeTimer = undefined;
+    }
   }
 
   ngOnDestroy(): void {

@@ -171,13 +171,57 @@
 }
 
 .quantity-input {
-  width: 70px;
+  width: 54px;
   height: 32px;
   padding: 0 8px;
   border: 1px solid #e5e5eb;
   border-radius: 6px;
   color: #3e4050;
   text-align: center;
+}
+
+.quantity-controls {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.quantity-input::-webkit-inner-spin-button,
+.quantity-input::-webkit-outer-spin-button {
+  margin: 0;
+  appearance: none;
+}
+
+.quantity-input {
+  appearance: textfield;
+}
+
+.quantity-stepper {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.quantity-step-button {
+  width: 20px;
+  height: 15px;
+  padding: 0;
+  border: 1px solid #e5e5eb;
+  border-radius: 3px;
+  background: #fff;
+  color: #5c5e6c;
+  font-size: 8px;
+  line-height: 1;
+}
+
+.quantity-step-button:hover:not(:disabled) {
+  background: #f3f0ff;
+  color: #4d3ec5;
+}
+
+.quantity-step-button:disabled {
+  color: #c5c6ce;
+  cursor: not-allowed;
 }
 
 .offer-cell,

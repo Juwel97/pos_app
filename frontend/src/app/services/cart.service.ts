@@ -21,10 +21,11 @@ export class CartService {
     this.itemsState().reduce((total, item) => total + item.quantity, 0),
   );
 
-  add(item: CartItem): void {
+  add(item: CartItem): boolean {
     const items = this.itemsState();
     const existing = items.find((line) => line.itemId === item.itemId);
     if (existing) {
+      const maximumReached = existing.quantity >= item.stock;
       this.updateItems(
         items.map((line) =>
           line.itemId === item.itemId
@@ -32,9 +33,10 @@ export class CartService {
             : line,
         ),
       );
-      return;
+      return maximumReached;
     }
     if (item.stock > 0) this.updateItems([...items, { ...item, quantity: 1 }]);
+    return false;
   }
 
   setQuantity(itemId: number | string, quantity: number): void {
