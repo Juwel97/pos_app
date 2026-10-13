@@ -4,7 +4,7 @@ A small inventory-management app: a Java 21 / Spring Boot 4.1.0 REST API with a 
 
 ## Requirements
 
-- JDK 21
+- JDK 17
 - Maven 3.9+
 - Node.js 20.19+ (or 22.12+) and npm
 
