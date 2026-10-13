@@ -66,6 +66,25 @@ export class CartComponent {
     return this.lineOfferPrice(item) * item.quantity;
   }
 
+  setQuantity(item: CartItem, quantity: number): void {
+    this.cart.setQuantity(item.itemId, quantity);
+    if (quantity > item.stock) {
+      this.showMaximumQuantityNotice(item);
+    }
+  }
+
+  increaseQuantity(item: CartItem): void {
+    if (item.quantity >= item.stock) {
+      this.showMaximumQuantityNotice(item);
+      return;
+    }
+    this.setQuantity(item, item.quantity + 1);
+  }
+
+  private showMaximumQuantityNotice(item: CartItem): void {
+    this.notice.emit(`You have reached the maximum quantity of ${item.stock} for ${item.name}.`);
+  }
+
   openDiscountDialog(): void {
     this.discountDraft = '';
     this.error = '';

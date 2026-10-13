@@ -71,16 +71,33 @@
                   <span>{{ item.stock }} available</span>
                 </td>
                 <td>
-                  <input
-                    class="quantity-input"
-                    type="number"
-                    min="1"
-                    [max]="item.stock"
-                    [ngModel]="item.quantity"
-                    (ngModelChange)="cart.setQuantity(item.itemId, $event)"
-                    [name]="'quantity-' + item.itemId"
-                    [attr.aria-label]="'Quantity for ' + item.name"
-                  />
+                  <div class="quantity-controls">
+                    <input
+                      class="quantity-input"
+                      type="number"
+                      min="1"
+                      [max]="item.stock"
+                      [ngModel]="item.quantity"
+                      (ngModelChange)="setQuantity(item, $event)"
+                      [name]="'quantity-' + item.itemId"
+                      [attr.aria-label]="'Quantity for ' + item.name"
+                    />
+                    <div class="quantity-stepper" [attr.aria-label]="'Adjust quantity for ' + item.name">
+                      <button
+                        class="quantity-step-button"
+                        type="button"
+                        [attr.aria-label]="'Increase quantity for ' + item.name"
+                        (click)="increaseQuantity(item)"
+                      >▲</button>
+                      <button
+                        class="quantity-step-button"
+                        type="button"
+                        [disabled]="item.quantity <= 1"
+                        [attr.aria-label]="'Decrease quantity for ' + item.name"
+                        (click)="setQuantity(item, item.quantity - 1)"
+                      >▼</button>
+                    </div>
+                  </div>
                 </td>
                 <td>{{ money.format(lineTotal(item)) }}</td>
                 <td class="offer-cell">{{ money.format(lineOfferTotal(item)) }}</td>

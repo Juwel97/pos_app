@@ -149,7 +149,6 @@
                         type="button"
                         title="Add to cart"
                         [attr.aria-label]="'Add ' + item.name + ' to cart'"
-                        [disabled]="item.quantity < 1"
                         (click)="addToCart(item)"
                       >
                         <svg lucideShoppingCart [size]="16"></svg>
