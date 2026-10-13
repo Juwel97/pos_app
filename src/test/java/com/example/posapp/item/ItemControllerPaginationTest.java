@@ -56,4 +56,24 @@ class ItemControllerPaginationTest {
                 .andExpect(jsonPath("$.page").value(0))
                 .andExpect(jsonPath("$.size").value(10));
     }
+
+    @Test
+    void searchCanFilterLowStockItems() throws Exception {
+        int[] quantities = {0, 2, 4, 5, 8};
+        IntStream.range(0, quantities.length).forEach(i -> repository.save(new Item(
+                "Item " + i,
+                "SKU-" + i,
+                "BATCH-" + i,
+                "Description " + i,
+                new BigDecimal("10.00"),
+                quantities[i],
+                "Category " + i,
+                LocalDate.now().plusDays(i)
+        )));
+
+        mockMvc.perform(get("/item/search").param("lowStockOnly", "true"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content.length()").value(3))
+                .andExpect(jsonPath("$.totalElements").value(3));
+    }
 }

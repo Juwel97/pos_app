@@ -27,6 +27,15 @@ public class OrderHistory {
     @Column(name = "discount_percent", nullable = false)
     private int discountPercent;
 
+    @Column(name = "doctor_name", length = 120)
+    private String doctorName;
+
+    @Column(name = "patient_name", length = 120)
+    private String patientName;
+
+    @Column(name = "patient_phone", length = 30)
+    private String patientPhone;
+
     @Column(name = "total_quantity", nullable = false)
     private int totalQuantity;
 
@@ -42,9 +51,19 @@ public class OrderHistory {
     protected OrderHistory() {
     }
 
-    public OrderHistory(int discountPercent, int totalQuantity, BigDecimal totalPrice, BigDecimal totalOfferPrice) {
+    public OrderHistory(
+            int discountPercent,
+            String doctorName,
+            String patientName,
+            String patientPhone,
+            int totalQuantity,
+            BigDecimal totalPrice,
+            BigDecimal totalOfferPrice) {
         this.createdAt = LocalDateTime.now();
         this.discountPercent = discountPercent;
+        this.doctorName = doctorName;
+        this.patientName = patientName;
+        this.patientPhone = patientPhone;
         this.totalQuantity = totalQuantity;
         this.totalPrice = totalPrice;
         this.totalOfferPrice = totalOfferPrice;
@@ -58,6 +77,9 @@ public class OrderHistory {
     public Long getId() { return id; }
     public LocalDateTime getCreatedAt() { return createdAt; }
     public int getDiscountPercent() { return discountPercent; }
+    public String getDoctorName() { return doctorName; }
+    public String getPatientName() { return patientName; }
+    public String getPatientPhone() { return patientPhone; }
     public int getTotalQuantity() { return totalQuantity; }
     public BigDecimal getTotalPrice() { return totalPrice; }
     public BigDecimal getTotalOfferPrice() { return totalOfferPrice; }

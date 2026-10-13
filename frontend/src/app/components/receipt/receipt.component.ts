@@ -15,6 +15,9 @@ export interface ReceiptData {
   orderId: number;
   createdAt: string;
   discountPercent: number;
+  doctorName: string | null;
+  patientName: string | null;
+  patientPhone: string | null;
   totalQuantity: number;
   totalPrice: number;
   totalOfferPrice: number;
@@ -35,4 +38,13 @@ export class ReceiptComponent {
     style: 'currency',
     currency: 'INR',
   });
+
+  formatPatientPhone(phone: string | null): string {
+    if (!phone) return '';
+
+    const digits = phone.replace(/\D/g, '');
+    if (digits.length === 10) return `+91-${digits}`;
+    if (digits.length === 12 && digits.startsWith('91')) return `+91-${digits.slice(2)}`;
+    return phone;
+  }
 }

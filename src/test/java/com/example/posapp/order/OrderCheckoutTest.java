@@ -62,12 +62,32 @@ class OrderCheckoutTest {
                 .andExpect(jsonPath("$.totalQuantity").value(2))
                 .andExpect(jsonPath("$.totalPrice").value(200.0))
                 .andExpect(jsonPath("$.totalOfferPrice").value(180.0))
+                .andExpect(jsonPath("$.doctorName").doesNotExist())
                 .andExpect(jsonPath("$.items[0].itemName").value("Checkout item"))
                 .andExpect(jsonPath("$.items[0].offerPrice").value(90.0));
 
         org.assertj.core.api.Assertions.assertThat(itemRepository.findById(item.getId()).orElseThrow().getQuantity())
                 .isEqualTo(3);
         org.assertj.core.api.Assertions.assertThat(orderRepository.count()).isEqualTo(1);
+    }
+
+    @Test
+    void checkoutSavesOptionalPatientAndDoctorDetails() throws Exception {
+        mockMvc.perform(post("/orders/checkout")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                                {
+                                  "discountPercent":0,
+                                  "doctorName":"Dr. Sharma",
+                                  "patientName":"Aarav Das",
+                                  "patientPhone":"9876543210",
+                                  "items":[{"itemId":%d,"quantity":1}]
+                                }
+                                """.formatted(item.getId())))
+                .andExpect(status().isCreated())
+                .andExpect(jsonPath("$.doctorName").value("Dr. Sharma"))
+                .andExpect(jsonPath("$.patientName").value("Aarav Das"))
+                .andExpect(jsonPath("$.patientPhone").value("9876543210"));
     }
 
     @Test

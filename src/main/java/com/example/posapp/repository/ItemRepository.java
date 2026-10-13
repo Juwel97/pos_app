@@ -23,12 +23,16 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select count(i) from Item i where i.quantity < 5")
     long countLimitedStock();
 
-    @Query("select i from Item i where :term = '' or "
+    @Query("select i from Item i where (:term = '' or "
             + "lower(i.name) like lower(concat('%', :term, '%')) or "
             + "lower(i.serialNumber) like lower(concat('%', :term, '%')) or "
             + "lower(coalesce(i.batchNumber, '')) like lower(concat('%', :term, '%')) or "
             + "lower(coalesce(i.category, '')) like lower(concat('%', :term, '%')) or "
-            + "lower(coalesce(i.description, '')) like lower(concat('%', :term, '%')) "
+            + "lower(coalesce(i.description, '')) like lower(concat('%', :term, '%'))) "
+            + "and (:lowStockOnly = false or i.quantity < 5) "
             + "order by i.id desc")
-    Page<Item> search(@Param("term") String term, Pageable pageable);
+    Page<Item> search(
+            @Param("term") String term,
+            @Param("lowStockOnly") boolean lowStockOnly,
+            Pageable pageable);
 }

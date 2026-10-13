@@ -40,11 +40,17 @@ export interface InventoryAnalysis {
 
 @Injectable({ providedIn: 'root' })
 export class InventoryApiService {
-  async searchItems(term: string, page: number, size: number): Promise<ItemPageResponse> {
+  async searchItems(
+    term: string,
+    page: number,
+    size: number,
+    lowStockOnly = false,
+  ): Promise<ItemPageResponse> {
     const params = new URLSearchParams();
     if (term) params.set('q', term);
     params.set('page', String(Math.max(page, 0)));
     params.set('size', String(size));
+    if (lowStockOnly) params.set('lowStockOnly', 'true');
     return (await this.request<ItemPageResponse>(`/item/search?${params}`)) ?? {};
   }
 

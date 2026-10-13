@@ -67,6 +67,55 @@
   background: #fff;
 }
 
+.customer-details {
+  padding: 16px 18px;
+  border-bottom: 1px solid #ededf1;
+  background: #fcfcfb;
+}
+
+.customer-details h2 {
+  margin: 0 0 12px;
+  color: #343645;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.customer-details h2 span {
+  color: #91939f;
+  font-size: 10px;
+  font-weight: 400;
+}
+
+.customer-fields {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px 12px;
+}
+
+.customer-fields label {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: #555766;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.customer-fields input {
+  width: 100%;
+  height: 36px;
+  padding: 0 10px;
+  border: 1px solid #e5e5eb;
+  border-radius: 6px;
+  color: #3e4050;
+  font-size: 12px;
+}
+
+.customer-fields input:focus {
+  border-color: #8c7ff0;
+  outline: 2px solid #8c7ff033;
+}
+
 .cart-table-scroll {
   overflow-x: auto;
 }

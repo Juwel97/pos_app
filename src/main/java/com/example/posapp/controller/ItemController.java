@@ -33,8 +33,9 @@ public class ItemController {
     public ItemPageResponse search(
             @RequestParam(required = false) String q,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        return service.search(q, page, size);
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "false") boolean lowStockOnly) {
+        return service.search(q, page, size, lowStockOnly);
     }
 
     @DeleteMapping("/item/delete/{id}")

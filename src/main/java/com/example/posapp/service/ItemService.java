@@ -36,11 +36,15 @@ public class ItemService {
     }
 
     @Transactional(readOnly = true)
-    public ItemPageResponse search(String term, int page, int size) {
+    public ItemPageResponse search(String term, int page, int size, boolean lowStockOnly) {
         int normalizedPage = Math.max(page, 0);
         int normalizedSize = size <= 0 ? 10 : Math.min(size, 100);
         Pageable pageable = PageRequest.of(normalizedPage, normalizedSize);
-        Page<Item> itemPage = repository.search(term == null ? "" : term.trim(), pageable);
+        Page<Item> itemPage = repository.search(
+            term == null ? "" : term.trim(),
+            lowStockOnly,
+            pageable
+        );
 
         return new ItemPageResponse(
             itemPage.getContent(),

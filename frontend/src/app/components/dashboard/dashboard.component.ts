@@ -58,6 +58,7 @@ export class DashboardComponent implements OnInit {
   totalMedicineCount = 0;
   totalInventoryValue = 0;
   limitedStockCount = 0;
+  lowStockOnly = false;
   query = '';
   page = 0;
   readonly pageSize = 10;
@@ -100,7 +101,12 @@ export class DashboardComponent implements OnInit {
 
   async loadItems(term = '', requestedPage = 0): Promise<void> {
     try {
-      const data = await this.inventoryApi.searchItems(term, requestedPage, this.pageSize);
+      const data = await this.inventoryApi.searchItems(
+        term,
+        requestedPage,
+        this.pageSize,
+        this.lowStockOnly,
+      );
       this.items = data.content ?? [];
       this.page = data.page ?? 0;
       this.totalItems = data.totalElements ?? 0;
@@ -125,6 +131,11 @@ export class DashboardComponent implements OnInit {
   clearSearch(): void {
     this.query = '';
     void this.loadItems('', 0);
+  }
+
+  toggleLowStockFilter(): void {
+    this.lowStockOnly = !this.lowStockOnly;
+    void this.loadItems(this.query, 0);
   }
 
   addToCart(item: InventoryItem): void {

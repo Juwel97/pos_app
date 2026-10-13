@@ -51,7 +51,7 @@ export class CartService {
   }
 
   setDiscount(percent: number): void {
-    this.discountState.set(Math.max(1, Math.min(100, Math.floor(percent))));
+    this.discountState.set(Math.max(0, Math.min(100, Math.floor(percent))));
   }
 
   clearDiscount(): void {
