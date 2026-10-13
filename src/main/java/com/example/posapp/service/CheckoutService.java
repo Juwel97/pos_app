@@ -63,7 +63,14 @@ public class CheckoutService {
             item.reduceQuantity(quantity);
         }
 
-        OrderHistory order = new OrderHistory(request.discountPercent(), totalQuantity, subtotal, offerTotal);
+        OrderHistory order = new OrderHistory(
+                request.discountPercent(),
+                request.doctorName(),
+                request.patientName(),
+                request.patientPhone(),
+                totalQuantity,
+                subtotal,
+                offerTotal);
         orderItems.forEach(order::addItem);
         OrderHistory savedOrder = orderRepository.saveAndFlush(order);
         List<OrderItemResponse> responseItems = orderItems.stream()
@@ -81,6 +88,9 @@ public class CheckoutService {
                 savedOrder.getId(),
                 savedOrder.getCreatedAt(),
                 savedOrder.getDiscountPercent(),
+                savedOrder.getDoctorName(),
+                savedOrder.getPatientName(),
+                savedOrder.getPatientPhone(),
                 savedOrder.getTotalQuantity(),
                 savedOrder.getTotalPrice(),
                 savedOrder.getTotalOfferPrice(),

@@ -38,6 +38,9 @@ export class CartComponent {
   readonly money = new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' });
   discountDialogOpen = false;
   discountDraft = '';
+  doctorName = '';
+  patientName = '';
+  patientPhone = '';
   busy = false;
   error = '';
   receipt: ReceiptData | null = null;
@@ -48,6 +51,10 @@ export class CartComponent {
 
   get totalOfferPrice(): number {
     return this.cart.items().reduce((total, item) => total + this.lineOfferTotal(item), 0);
+  }
+
+  lineTotal(item: CartItem): number {
+    return item.unitPrice * item.quantity;
   }
 
   lineOfferPrice(item: CartItem): number {
@@ -67,8 +74,8 @@ export class CartComponent {
 
   applyDiscount(): void {
     const discount = Number(this.discountDraft);
-    if (!/^\d{1,3}$/.test(this.discountDraft) || discount < 1 || discount > 100) {
-      this.error = 'Enter a whole number from 1 to 100.';
+    if (!/^\d{1,3}$/.test(this.discountDraft) || discount < 0 || discount > 100) {
+      this.error = 'Enter a whole number from 0 to 100.';
       return;
     }
     this.cart.setDiscount(discount);
@@ -80,12 +87,18 @@ export class CartComponent {
     if (this.busy || !this.cart.items().length) return;
     this.busy = true;
     this.error = '';
+    const customerDetails = {
+      doctorName: this.doctorName.trim() || null,
+      patientName: this.patientName.trim() || null,
+      patientPhone: this.patientPhone.trim() || null,
+    };
     try {
       const response = await fetch('/orders/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           discountPercent: this.cart.discountPercent(),
+          ...customerDetails,
           items: this.cart.items().map((item) => ({
             itemId: Number(item.itemId),
             quantity: item.quantity,
@@ -96,8 +109,17 @@ export class CartComponent {
         const body = (await response.json().catch(() => ({}))) as { error?: string };
         throw new Error(body.error || `Checkout failed (${response.status})`);
       }
-      this.receipt = (await response.json()) as ReceiptData;
+      const receipt = (await response.json()) as ReceiptData;
+      this.receipt = {
+        ...receipt,
+        doctorName: receipt.doctorName ?? customerDetails.doctorName,
+        patientName: receipt.patientName ?? customerDetails.patientName,
+        patientPhone: receipt.patientPhone ?? customerDetails.patientPhone,
+      };
       this.cart.clear();
+      this.doctorName = '';
+      this.patientName = '';
+      this.patientPhone = '';
       this.checkoutComplete.emit();
     } catch (error) {
       this.error = error instanceof Error ? error.message : 'Checkout could not be completed.';

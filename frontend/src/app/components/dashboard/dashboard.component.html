@@ -40,23 +40,30 @@
         </div>
         <span class="stat-hint">Based on current stock</span>
       </article>
-      <article class="stat-card">
-        <div class="stat-label">Low stock</div>
-        <div class="stat-bottom">
+      <button
+        class="stat-card low-stock-card"
+        type="button"
+        [attr.aria-pressed]="lowStockOnly"
+        (click)="toggleLowStockFilter()"
+      >
+        <span class="stat-label">Low stock</span>
+        <span class="stat-bottom">
           <strong>{{ limitedStockCount }}</strong>
           <span class="stat-icon amber"><span class="stock-dot"></span></span>
-        </div>
+        </span>
         <span class="stat-hint">Fewer than 5 units</span>
-      </article>
+      </button>
     </section>
 
     <section class="inventory-card">
       <div class="table-heading">
         <div>
-          <h2>All items</h2>
+          <h2>{{ lowStockOnly ? 'Low stock items' : 'All items' }}</h2>
           <p>
             @if (query) {
               Showing results for <strong>“{{ query }}”</strong>
+            } @else if (lowStockOnly) {
+              Products with fewer than 5 units in stock
             } @else {
               A complete list of products in your store
             }
@@ -123,14 +130,14 @@
                     <span
                       class="status"
                       [class.out]="item.quantity === 0"
-                      [class.low]="item.quantity > 0 && item.quantity <= 5"
-                      [class.in]="item.quantity > 5"
+                      [class.low]="item.quantity > 0 && item.quantity < 5"
+                      [class.in]="item.quantity >= 5"
                     >
                       <i></i>
                       {{
                         item.quantity === 0
                           ? 'Out of stock'
-                          : item.quantity <= 5
+                          : item.quantity < 5
                             ? 'Low stock'
                             : 'In stock'
                       }}
@@ -174,15 +181,29 @@
       } @else {
         <div class="empty-state">
           <span class="empty-icon"><svg lucideArchive [size]="23"></svg></span>
-          <h3>{{ query ? 'No matching items' : 'Your inventory is ready' }}</h3>
+          <h3>
+            {{
+              lowStockOnly
+                ? query
+                  ? 'No matching low-stock items'
+                  : 'No low-stock items'
+                : query
+                  ? 'No matching items'
+                  : 'Your inventory is ready'
+            }}
+          </h3>
           <p>
             {{
-              query
-                ? 'Try another name, serial number, batch number, or category.'
-                : 'Add your first item to start tracking your products.'
+              lowStockOnly
+                ? query
+                  ? 'Try another search term.'
+                  : 'All products have at least 5 units in stock.'
+                : query
+                  ? 'Try another name, serial number, batch number, or category.'
+                  : 'Add your first item to start tracking your products.'
             }}
           </p>
-          @if (!query) {
+          @if (!query && !lowStockOnly) {
             <button class="primary-button" type="button" (click)="openModal('add')">
               <svg lucideCirclePlus [size]="17"></svg> Add your first item
             </button>

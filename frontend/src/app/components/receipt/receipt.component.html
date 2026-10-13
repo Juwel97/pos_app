@@ -1,16 +1,38 @@
 <article class="receipt-print" aria-label="Customer receipt">
   <header class="receipt-header">
     <h1>J K Wellness Pharmacy</h1>
-    <p>Kharibuna, Bhawagwanagola, Murshidabad, WB, Pin-742134</p>
+    <div class="receipt-address">
+      <div class="receipt-contact-line">
+        <span>Chemist &amp; Druggist</span>
+        <span>M: +91-7001080079</span>
+      </div>
+      <p>
+        Alaipur <strong>*</strong> Beside B.S.F Road <strong>*</strong> Ranitala
+        <strong>*</strong> Murshidabad <strong>*</strong> WB <strong>*</strong> Pin: 742134
+      </p>
+      <p>
+        DL.No: WB/MSD/BIO/R/785414 <strong>*</strong> DL.No: WB/MSD/NBO/R/785414
+      </p>
+    </div>
   </header>
 
   <div class="receipt-meta">
-    <span>Order #{{ receipt.orderId }}</span>
+    <strong>Order #{{ receipt.orderId }}</strong>
     <time [attr.datetime]="receipt.createdAt">
-      {{ receipt.createdAt | date: 'dd-MM-yyyy HH:mm:ss' }}
-      <span class="weekday">{{ receipt.createdAt | date: 'EEEE' }}</span>
+      {{ receipt.createdAt | date: 'd MMMM y EEE HH:mm:ss' }}
     </time>
   </div>
+
+  <section class="receipt-customer" aria-label="Patient and doctor details">
+    <div class="receipt-doctor-details">
+      <strong>Doctor name:</strong>
+      <span>{{ receipt.doctorName ?? '' }}</span>
+    </div>
+    <div class="receipt-patient-details">
+      <span><strong>Patient name:</strong> {{ receipt.patientName ?? '' }}</span>
+      <span><strong>Patient phone:</strong> {{ formatPatientPhone(receipt.patientPhone) }}</span>
+    </div>
+  </section>
 
   <hr class="receipt-rule" />
 

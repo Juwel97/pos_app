@@ -74,6 +74,28 @@
   box-shadow: 0 2px 5px #22253804;
 }
 
+.low-stock-card {
+  width: 100%;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.low-stock-card:hover,
+.low-stock-card[aria-pressed='true'] {
+  border-color: #e6a338;
+  box-shadow: 0 3px 10px #e6a33824;
+}
+
+.low-stock-card:focus-visible {
+  outline: 2px solid #dc9a29;
+  outline-offset: 2px;
+}
+
 .stat-label {
   font-size: 12px;
   color: #77798d;

@@ -12,6 +12,44 @@
 
   @if (cart.items().length) {
     <section class="cart-panel" aria-label="Cart items">
+      <section class="customer-details" aria-label="Customer details">
+        <h2>Patient &amp; doctor details <span>(optional)</span></h2>
+        <div class="customer-fields">
+          <label>
+            Doctor name
+            <input
+              type="text"
+              name="doctorName"
+              placeholder="Enter doctor name"
+              autocomplete="name"
+              maxlength="120"
+              [(ngModel)]="doctorName"
+            />
+          </label>
+          <label>
+            Patient name
+            <input
+              type="text"
+              name="patientName"
+              placeholder="Enter patient name"
+              autocomplete="name"
+              maxlength="120"
+              [(ngModel)]="patientName"
+            />
+          </label>
+          <label>
+            Patient phone number
+            <input
+              type="tel"
+              name="patientPhone"
+              placeholder="Patient phone number"
+              autocomplete="tel"
+              maxlength="30"
+              [(ngModel)]="patientPhone"
+            />
+          </label>
+        </div>
+      </section>
       <div class="cart-table-scroll">
         <table class="cart-table">
           <thead>
@@ -19,7 +57,7 @@
               <th>SL NO</th>
               <th>ITEM NAME</th>
               <th>ITEM QUANTITY</th>
-              <th>PRICE</th>
+              <th>ACTUAL PRICE</th>
               <th>OFFER PRICE</th>
               <th><span class="sr-only">Remove</span></th>
             </tr>
@@ -44,8 +82,8 @@
                     [attr.aria-label]="'Quantity for ' + item.name"
                   />
                 </td>
-                <td>{{ money.format(item.unitPrice) }}</td>
-                <td class="offer-cell">{{ money.format(lineOfferPrice(item)) }}</td>
+                <td>{{ money.format(lineTotal(item)) }}</td>
+                <td class="offer-cell">{{ money.format(lineOfferTotal(item)) }}</td>
                 <td>
                   <button
                     class="remove-button"
@@ -117,7 +155,6 @@
         <div class="dialog-heading">
           <div>
             <span class="eyebrow">ORDER ADJUSTMENT</span>
-            <h2 id="discount-title">Apply a discount</h2>
           </div>
           <button
             class="icon-button"
@@ -139,7 +176,7 @@
                 inputmode="numeric"
                 pattern="[0-9]*"
                 maxlength="3"
-                placeholder="1-100"
+                placeholder="0-100"
                 required
                 [(ngModel)]="discountDraft"
               />
