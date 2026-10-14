@@ -53,6 +53,28 @@ export class CartComponent {
     return this.cart.items().reduce((total, item) => total + this.lineOfferTotal(item), 0);
   }
 
+  get totalCgst(): number {
+    return this.cart.items().reduce((total, item) => total + this.lineCgst(item), 0);
+  }
+
+  get totalSgst(): number {
+    return this.cart.items().reduce((total, item) => total + this.lineSgst(item), 0);
+  }
+
+  get grandTotal(): number {
+    return this.totalOfferPrice + this.totalCgst + this.totalSgst;
+  }
+
+  get quantitySummary(): string {
+    const totals = this.cart.items().reduce<Record<string, number>>((summary, item) => {
+      summary[item.saleUnit] = (summary[item.saleUnit] ?? 0) + item.quantity;
+      return summary;
+    }, {});
+    return Object.entries(totals)
+      .map(([unit, quantity]) => `${quantity} ${unit === 'CAPSULE' ? 'capsule(s)' : 'strip(s)/unit(s)'}`)
+      .join(' + ');
+  }
+
   lineTotal(item: CartItem): number {
     return item.unitPrice * item.quantity;
   }
@@ -83,6 +105,18 @@ export class CartComponent {
 
   private showMaximumQuantityNotice(item: CartItem): void {
     this.notice.emit(`You have reached the maximum quantity of ${item.stock} for ${item.name}.`);
+  }
+
+  lineCgst(item: CartItem): number {
+    return this.taxAmount(this.lineOfferTotal(item));
+  }
+
+  lineSgst(item: CartItem): number {
+    return this.taxAmount(this.lineOfferTotal(item));
+  }
+
+  private taxAmount(amount: number): number {
+    return Math.round((amount * 0.025 + Number.EPSILON) * 100) / 100;
   }
 
   openDiscountDialog(): void {
@@ -121,6 +155,7 @@ export class CartComponent {
           items: this.cart.items().map((item) => ({
             itemId: Number(item.itemId),
             quantity: item.quantity,
+            saleUnit: item.saleUnit,
           })),
         }),
       });

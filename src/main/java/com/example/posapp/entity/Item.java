@@ -20,6 +20,12 @@ public class Item {
     @Column(nullable = false, length = 120)
     private String name;
 
+    @Column(name = "mfg_name", length = 120)
+    private String mfgName;
+
+    @Column(name = "schedule_h1", nullable = false)
+    private boolean scheduleH1;
+
     @Column(name = "sku", nullable = false, unique = true, length = 60)
     private String serialNumber;
     
@@ -35,6 +41,12 @@ public class Item {
     @Column(nullable = false)
     private Integer quantity;
 
+    @Column(name = "capsules_per_strip")
+    private Integer capsulesPerStrip;
+
+    @Column(name = "capsule_quantity")
+    private Integer capsuleQuantity;
+
     @Column(length = 80)
     private String category;
 
@@ -46,7 +58,19 @@ public class Item {
 
     public Item(String name, String serialNumber, String batchNumber, String description, BigDecimal price,
             Integer quantity, String category, LocalDate expireDate) {
+        this(name, serialNumber, batchNumber, description, price, quantity, category, expireDate, null);
+    }
+
+    public Item(String name, String serialNumber, String batchNumber, String description, BigDecimal price,
+            Integer quantity, String category, LocalDate expireDate, String mfgName) {
+        this(name, serialNumber, batchNumber, description, price, quantity, category, expireDate, mfgName, false);
+    }
+
+    public Item(String name, String serialNumber, String batchNumber, String description, BigDecimal price,
+            Integer quantity, String category, LocalDate expireDate, String mfgName, boolean scheduleH1) {
         this.name = name;
+        this.mfgName = mfgName;
+        this.scheduleH1 = scheduleH1;
         this.serialNumber = serialNumber;
         this.batchNumber = batchNumber;
         this.description = description;
@@ -58,11 +82,19 @@ public class Item {
 
     public Long getId() { return id; }
     public String getName() { return name; }
+    public String getMfgName() { return mfgName; }
+    public boolean isScheduleH1() { return scheduleH1; }
     public String getSerialNumber() { return serialNumber; }
     public String getBatchNumber() { return batchNumber; }
     public String getDescription() { return description; }
     public BigDecimal getPrice() { return price; }
     public Integer getQuantity() { return quantity; }
+    public Integer getCapsulesPerStrip() { return capsulesPerStrip; }
+    public Integer getCapsuleQuantity() { return capsuleQuantity; }
+    public Integer getLooseCapsules() {
+        return isCapsuleTracked() ? capsuleQuantity % capsulesPerStrip : 0;
+    }
+    public boolean isCapsuleTracked() { return capsulesPerStrip != null && capsuleQuantity != null; }
     public String getCategory() { return category; }
     public LocalDate getExpireDate() { return expireDate; }
 
@@ -70,9 +102,16 @@ public class Item {
         this.quantity -= amount;
     }
 
-    public void update(String name, String serialNumber, String batchNumber, String description, BigDecimal price,
-            Integer quantity, String category, LocalDate expireDate) {
+    public void reduceCapsuleQuantity(int amount) {
+        this.capsuleQuantity -= amount;
+        this.quantity = this.capsuleQuantity / this.capsulesPerStrip;
+    }
+
+    public void update(String name, String mfgName, String serialNumber, String batchNumber, String description, BigDecimal price,
+            Integer quantity, String category, LocalDate expireDate, boolean scheduleH1) {
         this.name = name;
+        this.mfgName = mfgName;
+        this.scheduleH1 = scheduleH1;
         this.serialNumber = serialNumber;
         this.batchNumber = batchNumber;
         this.description = description;
@@ -80,5 +119,11 @@ public class Item {
         this.quantity = quantity;
         this.category = category;
         this.expireDate = expireDate;
+    }
+
+    public void configureCapsuleStock(Integer capsulesPerStrip, Integer capsuleQuantity) {
+        this.capsulesPerStrip = capsulesPerStrip;
+        this.capsuleQuantity = capsuleQuantity;
+        this.quantity = capsuleQuantity == null ? this.quantity : capsuleQuantity / capsulesPerStrip;
     }
 }

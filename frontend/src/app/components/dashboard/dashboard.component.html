@@ -51,7 +51,7 @@
           <strong>{{ limitedStockCount }}</strong>
           <span class="stat-icon amber"><span class="stock-dot"></span></span>
         </span>
-        <span class="stat-hint">Fewer than 5 units</span>
+        <span class="stat-hint">Fewer than 5 strips / items</span>
       </button>
     </section>
 
@@ -63,7 +63,7 @@
             @if (query) {
               Showing results for <strong>“{{ query }}”</strong>
             } @else if (lowStockOnly) {
-              Products with fewer than 5 units in stock
+              Products with fewer than 5 strips / items in stock
             } @else {
               A complete list of products in your store
             }
@@ -81,7 +81,7 @@
                 <th>SERIAL NUMBER</th>
                 <th>BATCH NUMBER</th>
                 <th>CATEGORY</th>
-                <th>PRICE</th>
+                <th>STRIP / UNIT PRICE</th>
                 <th>QUANTITY</th>
                 <th>EXPIRES</th>
                 <th>STATUS</th>
@@ -118,7 +118,7 @@
                     }
                   </td>
                   <td class="price-cell">{{ formatPrice(item.price) }}</td>
-                  <td>{{ item.quantity }}</td>
+                  <td>{{ stockDisplay(item) }}</td>
                   <td>
                     @if (item.expireDate) {
                       <time [attr.datetime]="item.expireDate">{{ item.expireDate }}</time>
@@ -129,15 +129,15 @@
                   <td>
                     <span
                       class="status"
-                      [class.out]="item.quantity === 0"
-                      [class.low]="item.quantity > 0 && item.quantity < 5"
-                      [class.in]="item.quantity >= 5"
+                      [class.out]="isOutOfStock(item)"
+                      [class.low]="isLowStock(item)"
+                      [class.in]="isInStock(item)"
                     >
                       <i></i>
                       {{
-                        item.quantity === 0
+                        isOutOfStock(item)
                           ? 'Out of stock'
-                          : item.quantity < 5
+                          : isLowStock(item)
                             ? 'Low stock'
                             : 'In stock'
                       }}
@@ -149,6 +149,7 @@
                         type="button"
                         title="Add to cart"
                         [attr.aria-label]="'Add ' + item.name + ' to cart'"
+                        [disabled]="isOutOfStock(item)"
                         (click)="addToCart(item)"
                       >
                         <svg lucideShoppingCart [size]="16"></svg>

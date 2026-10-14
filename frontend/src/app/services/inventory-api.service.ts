@@ -3,11 +3,16 @@ import { Injectable } from '@angular/core';
 export interface InventoryItem {
   id: number | string;
   name: string;
+  mfgName?: string | null;
   serialNumber: string;
   batchNumber?: string | null;
   description?: string | null;
   price: number | string;
   quantity: number;
+  capsulesPerStrip?: number | null;
+  capsuleQuantity?: number | null;
+  looseCapsules?: number;
+  scheduleH1?: boolean;
   category?: string | null;
   expireDate?: string | null;
 }
@@ -23,11 +28,14 @@ export interface ItemPageResponse {
 
 export interface ItemWriteRequest {
   name: string;
+  mfgName: string;
   serialNumber: string;
   batchNumber: string;
   description: string;
   price: number;
   quantity: number;
+  capsulesPerStrip: number;
+  scheduleH1: boolean;
   category: string;
   expireDate: string;
 }

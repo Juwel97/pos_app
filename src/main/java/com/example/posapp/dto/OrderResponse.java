@@ -14,5 +14,8 @@ public record OrderResponse(
         int totalQuantity,
         BigDecimal totalPrice,
         BigDecimal totalOfferPrice,
+        BigDecimal totalCgst,
+        BigDecimal totalSgst,
+        BigDecimal grandTotal,
         List<OrderItemResponse> items) {
 }

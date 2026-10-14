@@ -42,31 +42,50 @@
         <tr>
           <th class="serial-column">Sl no</th>
           <th class="name-column">Item name</th>
+          <th class="metadata-column">Mfg name</th>
+          <th class="metadata-column">Batch No</th>
+          <th class="metadata-column">Exp Date</th>
+          <th class="metadata-column">Schedule H1</th>
           <th class="number-column">Quantity</th>
           <th class="number-column">Price</th>
           <th class="number-column">Offer price</th>
+          <th class="number-column">CGST 2.5%</th>
+          <th class="number-column">SGST 2.5%</th>
         </tr>
       </thead>
       <tbody>
-        @for (item of receipt.items; track item.itemId; let index = $index) {
+        @for (item of receipt.items; track item.itemId + '-' + item.saleUnit; let index = $index) {
           <tr>
             <td class="serial-column">{{ index + 1 }}</td>
             <td class="name-column">{{ item.itemName }}</td>
-            <td class="number-column">{{ item.quantity }}</td>
+            <td class="metadata-column">{{ item.mfgName || '-' }}</td>
+            <td class="metadata-column">{{ item.batchNumber || '-' }}</td>
+            <td class="metadata-column">{{ item.expireDate ? (item.expireDate | date: 'MMM y') : '-' }}</td>
+            <td class="metadata-column">{{ item.scheduleH1 ? 'Yes' : 'No' }}</td>
+            <td class="number-column">{{ item.quantity }} {{ item.saleUnit === 'CAPSULE' ? 'capsule(s)' : 'strip(s)' }}</td>
             <td class="number-column">{{ money.format(item.lineTotal) }}</td>
             <td class="number-column">{{ money.format(item.lineOfferTotal) }}</td>
+            <td class="number-column">{{ money.format(lineCgst(item)) }}</td>
+            <td class="number-column">{{ money.format(lineSgst(item)) }}</td>
           </tr>
         }
       </tbody>
       <tfoot>
         <tr>
-          <th colspan="2">Total</th>
-          <td class="number-column">{{ receipt.totalQuantity }}</td>
+          <th colspan="6">Total</th>
+          <td class="number-column">{{ quantitySummary() }}</td>
           <td class="number-column">{{ money.format(receipt.totalPrice) }}</td>
           <td class="number-column">{{ money.format(receipt.totalOfferPrice) }}</td>
+          <td class="number-column">{{ money.format(totalCgst()) }}</td>
+          <td class="number-column">{{ money.format(totalSgst()) }}</td>
         </tr>
       </tfoot>
     </table>
+  </div>
+
+  <div class="receipt-grand-total">
+    <strong>Amount payable incl. GST</strong>
+    <strong>{{ money.format(grandTotal()) }}</strong>
   </div>
 
   <hr class="receipt-rule" />

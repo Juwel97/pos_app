@@ -2,6 +2,7 @@ package com.example.posapp.service;
 
 import com.example.posapp.repository.ItemRepository;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -20,7 +21,13 @@ public class AnalysisService {
     }
 
     public BigDecimal getTotalValue() {
-        return repository.getTotalInventoryValue();
+        return repository.findAll().stream()
+            .map(item -> item.isCapsuleTracked()
+                ? item.getPrice().multiply(BigDecimal.valueOf(item.getCapsuleQuantity()))
+                    .divide(BigDecimal.valueOf(item.getCapsulesPerStrip()), 2, RoundingMode.HALF_UP)
+                : item.getPrice().multiply(BigDecimal.valueOf(item.getQuantity())))
+            .reduce(BigDecimal.ZERO, BigDecimal::add)
+            .setScale(2, RoundingMode.HALF_UP);
     }
 
     public long getLimitedStockCount() {

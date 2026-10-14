@@ -56,9 +56,15 @@
             <tr>
               <th>SL NO</th>
               <th>ITEM NAME</th>
+              <th>MFG NAME</th>
+              <th>BATCH NO</th>
+              <th>EXP DATE</th>
+              <th>SCHEDULE H1</th>
               <th>ITEM QUANTITY</th>
               <th>ACTUAL PRICE</th>
               <th>OFFER PRICE</th>
+              <th>CGST (2.5%)</th>
+              <th>SGST (2.5%)</th>
               <th><span class="sr-only">Remove</span></th>
             </tr>
           </thead>
@@ -68,9 +74,25 @@
                 <td class="serial-cell">{{ index + 1 }}</td>
                 <td class="name-cell">
                   <strong>{{ item.name }}</strong>
-                  <span>{{ item.stock }} available</span>
+                  <span>{{ item.stock }} {{ item.saleUnit === 'CAPSULE' ? 'capsules' : 'strips / units' }} available</span>
                 </td>
+                <td class="metadata-cell">{{ item.mfgName || '-' }}</td>
+                <td class="metadata-cell">{{ item.batchNumber || '-' }}</td>
+                <td class="metadata-cell">{{ item.expireDate ? (item.expireDate | date: 'MMM y') : '-' }}</td>
+                <td class="metadata-cell">{{ item.scheduleH1 ? 'Yes' : 'No' }}</td>
                 <td>
+                  @if (item.capsulesPerStrip) {
+                    <select
+                      class="quantity-input"
+                      [ngModel]="item.saleUnit"
+                      (ngModelChange)="cart.setSaleUnit(item.itemId, $event)"
+                      [name]="'unit-' + item.itemId"
+                      [attr.aria-label]="'Sale unit for ' + item.name"
+                    >
+                      <option value="STRIP" [disabled]="item.stripStock < 1">Strip</option>
+                      <option value="CAPSULE" [disabled]="item.capsuleStock < 1">Capsule</option>
+                    </select>
+                  }
                   <div class="quantity-controls">
                     <input
                       class="quantity-input"
@@ -101,6 +123,8 @@
                 </td>
                 <td>{{ money.format(lineTotal(item)) }}</td>
                 <td class="offer-cell">{{ money.format(lineOfferTotal(item)) }}</td>
+                <td>{{ money.format(lineCgst(item)) }}</td>
+                <td>{{ money.format(lineSgst(item)) }}</td>
                 <td>
                   <button
                     class="remove-button"
@@ -117,10 +141,12 @@
           </tbody>
           <tfoot>
             <tr>
-              <th colspan="2">Total</th>
-              <td class="total-quantity">{{ cart.totalQuantity() }}</td>
+              <th colspan="6">Total</th>
+              <td class="total-quantity">{{ quantitySummary }}</td>
               <td class="total-price">{{ money.format(totalPrice) }}</td>
               <td class="total-offer">{{ money.format(totalOfferPrice) }}</td>
+              <td>{{ money.format(totalCgst) }}</td>
+              <td>{{ money.format(totalSgst) }}</td>
               <td></td>
             </tr>
           </tfoot>
@@ -136,6 +162,7 @@
           } @else {
             <span>No discount applied</span>
           }
+          <span class="cart-payable">Payable incl. GST: {{ money.format(grandTotal) }}</span>
         </div>
         <div class="action-buttons">
           <button class="discount-button" type="button" (click)="openDiscountDialog()">

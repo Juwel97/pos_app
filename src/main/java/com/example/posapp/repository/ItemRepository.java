@@ -2,7 +2,6 @@ package com.example.posapp.repository;
 
 import com.example.posapp.entity.Item;
 import jakarta.persistence.LockModeType;
-import java.math.BigDecimal;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -17,10 +16,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
     @Query("select i from Item i where i.id = :id")
     Optional<Item> findByIdForUpdate(@Param("id") Long id);
 
-    @Query("select coalesce(sum(i.price * i.quantity), 0) from Item i")
-    BigDecimal getTotalInventoryValue();
-
-    @Query("select count(i) from Item i where i.quantity < 5")
+    @Query("select count(i) from Item i where (i.capsuleQuantity is null and i.quantity < 5) "
+            + "or (i.capsuleQuantity is not null and i.capsuleQuantity < 5 * i.capsulesPerStrip)")
     long countLimitedStock();
 
     @Query("select i from Item i where (:term = '' or "
@@ -29,7 +26,8 @@ public interface ItemRepository extends JpaRepository<Item, Long> {
             + "lower(coalesce(i.batchNumber, '')) like lower(concat('%', :term, '%')) or "
             + "lower(coalesce(i.category, '')) like lower(concat('%', :term, '%')) or "
             + "lower(coalesce(i.description, '')) like lower(concat('%', :term, '%'))) "
-            + "and (:lowStockOnly = false or i.quantity < 5) "
+            + "and (:lowStockOnly = false or (i.capsuleQuantity is null and i.quantity < 5) "
+            + "or (i.capsuleQuantity is not null and i.capsuleQuantity < 5 * i.capsulesPerStrip)) "
             + "order by i.id desc")
     Page<Item> search(
             @Param("term") String term,

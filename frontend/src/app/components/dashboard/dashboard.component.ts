@@ -82,6 +82,27 @@ export class DashboardComponent implements OnInit {
     return this.money.format(Number(price));
   }
 
+  stockDisplay(item: InventoryItem): string {
+    if (!item.capsulesPerStrip || item.capsuleQuantity == null) return `${item.quantity} units`;
+    const strips = Math.floor(item.capsuleQuantity / item.capsulesPerStrip);
+    const loose = item.capsuleQuantity % item.capsulesPerStrip;
+    return `${strips} strips${loose ? ` + ${loose} capsules` : ''}`;
+  }
+
+  isOutOfStock(item: InventoryItem): boolean {
+    return (item.capsuleQuantity ?? item.quantity) < 1;
+  }
+
+  isLowStock(item: InventoryItem): boolean {
+    return item.capsuleQuantity != null && item.capsulesPerStrip
+      ? item.capsuleQuantity < item.capsulesPerStrip * 5
+      : item.quantity > 0 && item.quantity < 5;
+  }
+
+  isInStock(item: InventoryItem): boolean {
+    return !this.isOutOfStock(item) && !this.isLowStock(item);
+  }
+
   ngOnInit(): void {
     void this.loadItems();
     void this.loadAnalysis();
@@ -139,19 +160,35 @@ export class DashboardComponent implements OnInit {
   }
 
   addToCart(item: InventoryItem): void {
-    if (item.quantity < 1) {
+    const capsuleTracked = item.capsulesPerStrip != null && item.capsuleQuantity != null;
+    const packSize = capsuleTracked ? item.capsulesPerStrip! : null;
+    const capsuleStock = capsuleTracked ? item.capsuleQuantity! : 0;
+    const stripStock = capsuleTracked ? Math.floor(capsuleStock / packSize!) : item.quantity;
+    if (capsuleTracked && capsuleStock < 1 || !capsuleTracked && item.quantity < 1) {
       this.showNotice('This item is out of stock.');
       return;
     }
-    const maximumReached = this.cart.add({
+    const saleUnit = capsuleTracked && stripStock === 0 ? 'CAPSULE' : 'STRIP';
+    this.cart.add({
       itemId: item.id,
       name: item.name,
+      mfgName: item.mfgName ?? null,
+      batchNumber: item.batchNumber ?? null,
+      expireDate: item.expireDate ?? null,
+      scheduleH1: item.scheduleH1 ?? false,
       quantity: 1,
-      stock: item.quantity,
-      unitPrice: Number(item.price),
+      stock: saleUnit === 'CAPSULE' ? capsuleStock : stripStock,
+      stripStock,
+      capsuleStock,
+      capsulesPerStrip: packSize,
+      saleUnit,
+      stripPrice: Number(item.price),
+      unitPrice: saleUnit === 'CAPSULE'
+        ? Math.round((Number(item.price) / packSize! + Number.EPSILON) * 100) / 100
+        : Number(item.price),
     });
     this.showNotice(
-      maximumReached
+        saleUnit
         ? `You have reached the maximum quantity of ${item.quantity} for ${item.name}.`
         : `${item.name} added to cart.`,
     );
@@ -171,6 +208,7 @@ export class DashboardComponent implements OnInit {
       ...form,
       price: Number(form.price),
       quantity: Number(form.quantity),
+      capsulesPerStrip: Number(form.capsulesPerStrip),
     };
     try {
       if (this.modal.type === 'add') {

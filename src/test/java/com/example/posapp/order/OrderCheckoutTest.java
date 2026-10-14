@@ -46,7 +46,9 @@ class OrderCheckoutTest {
                 new BigDecimal("100.00"),
                 5,
                 "Test",
-                LocalDate.now().plusDays(30)));
+                LocalDate.now().plusDays(30),
+                "Test Manufacturer",
+                true));
     }
 
     @Test
@@ -62,8 +64,17 @@ class OrderCheckoutTest {
                 .andExpect(jsonPath("$.totalQuantity").value(2))
                 .andExpect(jsonPath("$.totalPrice").value(200.0))
                 .andExpect(jsonPath("$.totalOfferPrice").value(180.0))
+                .andExpect(jsonPath("$.totalCgst").value(4.5))
+                .andExpect(jsonPath("$.totalSgst").value(4.5))
+                .andExpect(jsonPath("$.grandTotal").value(189.0))
                 .andExpect(jsonPath("$.doctorName").doesNotExist())
                 .andExpect(jsonPath("$.items[0].itemName").value("Checkout item"))
+                .andExpect(jsonPath("$.items[0].mfgName").value("Test Manufacturer"))
+                .andExpect(jsonPath("$.items[0].batchNumber").value("BATCH-001"))
+                .andExpect(jsonPath("$.items[0].expireDate").value(LocalDate.now().plusDays(30).toString()))
+                .andExpect(jsonPath("$.items[0].scheduleH1").value(true))
+                .andExpect(jsonPath("$.items[0].lineCgst").value(4.5))
+                .andExpect(jsonPath("$.items[0].lineSgst").value(4.5))
                 .andExpect(jsonPath("$.items[0].offerPrice").value(90.0));
 
         org.assertj.core.api.Assertions.assertThat(itemRepository.findById(item.getId()).orElseThrow().getQuantity())
@@ -104,4 +115,61 @@ class OrderCheckoutTest {
                 .isEqualTo(5);
         org.assertj.core.api.Assertions.assertThat(orderRepository.count()).isZero();
     }
+
+        @Test
+        void capsuleSaleUsesDerivedPriceAndConsumesCapsuleStock() throws Exception {
+                item.configureCapsuleStock(6, 25);
+                itemRepository.saveAndFlush(item);
+
+                mockMvc.perform(post("/orders/checkout")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("""
+                                                                {"discountPercent":0,"items":[{"itemId":%d,"quantity":3,"saleUnit":"CAPSULE"}]}
+                                                                """.formatted(item.getId())))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.totalQuantity").value(3))
+                                .andExpect(jsonPath("$.totalPrice").value(50.01))
+                                .andExpect(jsonPath("$.items[0].unitPrice").value(16.67))
+                                .andExpect(jsonPath("$.items[0].saleUnit").value("CAPSULE"))
+                                .andExpect(jsonPath("$.items[0].capsulesPerStrip").value(6));
+
+                Item updated = itemRepository.findById(item.getId()).orElseThrow();
+                org.assertj.core.api.Assertions.assertThat(updated.getCapsuleQuantity()).isEqualTo(22);
+                org.assertj.core.api.Assertions.assertThat(updated.getQuantity()).isEqualTo(3);
+                org.assertj.core.api.Assertions.assertThat(updated.getLooseCapsules()).isEqualTo(4);
+        }
+
+        @Test
+        void stripSaleConsumesPackSizeAndKeepsExactStripPrice() throws Exception {
+                item.configureCapsuleStock(10, 25);
+                itemRepository.saveAndFlush(item);
+
+                mockMvc.perform(post("/orders/checkout")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("""
+                                                                {"discountPercent":0,"items":[{"itemId":%d,"quantity":2,"saleUnit":"STRIP"}]}
+                                                                """.formatted(item.getId())))
+                                .andExpect(status().isCreated())
+                                .andExpect(jsonPath("$.totalPrice").value(200.0))
+                                .andExpect(jsonPath("$.items[0].unitPrice").value(100.0))
+                                .andExpect(jsonPath("$.items[0].saleUnit").value("STRIP"));
+
+                org.assertj.core.api.Assertions.assertThat(itemRepository.findById(item.getId()).orElseThrow().getCapsuleQuantity())
+                                .isEqualTo(5);
+        }
+
+        @Test
+        void legacyItemsRejectCapsuleSalesWithoutChangingStock() throws Exception {
+                mockMvc.perform(post("/orders/checkout")
+                                                .contentType(MediaType.APPLICATION_JSON)
+                                                .content("""
+                                                                {"discountPercent":0,"items":[{"itemId":%d,"quantity":1,"saleUnit":"CAPSULE"}]}
+                                                                """.formatted(item.getId())))
+                                .andExpect(status().isBadRequest())
+                                .andExpect(jsonPath("$.error").value("Checkout item is not configured for capsule sales"));
+
+                org.assertj.core.api.Assertions.assertThat(itemRepository.findById(item.getId()).orElseThrow().getQuantity())
+                                .isEqualTo(5);
+                org.assertj.core.api.Assertions.assertThat(orderRepository.count()).isZero();
+        }
 }

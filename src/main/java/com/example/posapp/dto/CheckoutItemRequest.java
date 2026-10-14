@@ -5,5 +5,6 @@ import jakarta.validation.constraints.Positive;
 
 public record CheckoutItemRequest(
         @NotNull @Positive Long itemId,
-        @Positive int quantity) {
+        @Positive int quantity,
+        String saleUnit) {
 }

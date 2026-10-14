@@ -34,6 +34,15 @@
           [(ngModel)]="form.name"
         />
       </label>
+      <label>
+        Mfg name
+        <input
+          maxlength="120"
+          placeholder="Enter manufacturer name"
+          name="mfgName"
+          [(ngModel)]="form.mfgName"
+        />
+      </label>
       <div class="form-row">
         <label>
           Serial number
@@ -64,9 +73,16 @@
           [(ngModel)]="form.category"
         />
       </label>
+      <label>
+        Schedule H1
+        <select name="scheduleH1" [(ngModel)]="form.scheduleH1">
+          <option [ngValue]="false">No</option>
+          <option [ngValue]="true">Yes</option>
+        </select>
+      </label>
       <div class="form-row">
         <label>
-          Price
+          Strip price
           <div class="input-prefix">
             <span>₹</span>
             <input
@@ -82,7 +98,7 @@
           </div>
         </label>
         <label>
-          Quantity
+          Quantity (strips)
           <input
             required
             type="number"
@@ -95,6 +111,19 @@
           />
         </label>
       </div>
+      <label>
+        Units per strip
+        <input
+          required
+          type="number"
+          min="1"
+          step="1"
+          placeholder="e.g. 10"
+          name="capsulesPerStrip"
+          [ngModel]="form.capsulesPerStrip"
+          (ngModelChange)="form.capsulesPerStrip = $event.toString()"
+        />
+      </label>
       <label>
         Expiration date
         <input type="date" name="expireDate" [(ngModel)]="form.expireDate" />

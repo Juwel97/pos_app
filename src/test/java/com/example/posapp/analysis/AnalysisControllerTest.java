@@ -51,6 +51,21 @@ class AnalysisControllerTest {
                 .andExpect(content().string("2"));
     }
 
+            @Test
+            void analysisValuesConfiguredCapsulesAndComparesStockToFiveStrips() throws Exception {
+            Item configured = newItem("SKU-CAPSULES", "100.00", 4);
+            configured.configureCapsuleStock(6, 25);
+            repository.saveAndFlush(configured);
+
+            mockMvc.perform(get("/analysis/total-value"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("476.67"));
+
+            mockMvc.perform(get("/analysis/limited-stock"))
+                .andExpect(status().isOk())
+                .andExpect(content().string("3"));
+            }
+
     private Item newItem(String sku, String price, int quantity) {
         return new Item("Medicine " + sku, sku, null, null, new BigDecimal(price), quantity, null,
                 LocalDate.now().plusDays(30));

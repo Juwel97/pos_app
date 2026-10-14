@@ -33,34 +33,64 @@ public class CheckoutService {
 
     @Transactional
     public OrderResponse checkout(CheckoutRequest request) {
-        Map<Long, Integer> quantities = new LinkedHashMap<>();
+        Map<SaleLine, Integer> quantities = new LinkedHashMap<>();
         for (CheckoutItemRequest item : request.items()) {
-            long itemId = item.itemId();
-            quantities.put(itemId, quantities.getOrDefault(itemId, 0) + item.quantity());
+            String saleUnit = item.saleUnit() == null ? "STRIP" : item.saleUnit().toUpperCase();
+            if (!saleUnit.equals("STRIP") && !saleUnit.equals("CAPSULE")) {
+                throw new IllegalArgumentException("Sale unit must be STRIP or CAPSULE");
+            }
+            SaleLine line = new SaleLine(item.itemId(), saleUnit);
+            quantities.put(line, quantities.getOrDefault(line, 0) + item.quantity());
         }
 
         BigDecimal subtotal = BigDecimal.ZERO;
         BigDecimal offerTotal = BigDecimal.ZERO;
+        BigDecimal cgstTotal = BigDecimal.ZERO;
+        BigDecimal sgstTotal = BigDecimal.ZERO;
         int totalQuantity = 0;
         List<OrderHistoryItem> orderItems = new ArrayList<>();
         BigDecimal discountMultiplier = BigDecimal.valueOf(100L - request.discountPercent());
 
-        for (Map.Entry<Long, Integer> entry : quantities.entrySet()) {
-            Item item = itemRepository.findByIdForUpdate(entry.getKey())
-                    .orElseThrow(() -> new ItemNotFoundException(entry.getKey()));
+        for (Map.Entry<SaleLine, Integer> entry : quantities.entrySet()) {
+            Item item = itemRepository.findByIdForUpdate(entry.getKey().itemId())
+                .orElseThrow(() -> new ItemNotFoundException(entry.getKey().itemId()));
             int quantity = entry.getValue();
-            if (item.getQuantity() < quantity) {
-                throw new InsufficientStockException(item.getName(), item.getQuantity());
+            String saleUnit = entry.getKey().saleUnit();
+            boolean capsuleSale = saleUnit.equals("CAPSULE");
+            if (capsuleSale && !item.isCapsuleTracked()) {
+                throw new IllegalArgumentException(item.getName() + " is not configured for capsule sales");
             }
 
-            BigDecimal unitPrice = item.getPrice();
+            int stockToConsume = capsuleSale ? quantity : item.isCapsuleTracked()
+                    ? Math.multiplyExact(quantity, item.getCapsulesPerStrip()) : quantity;
+            int available = item.isCapsuleTracked() ? item.getCapsuleQuantity() : item.getQuantity();
+            if (available < stockToConsume) {
+                int availableDisplay = item.isCapsuleTracked() && !capsuleSale
+                        ? available / item.getCapsulesPerStrip() : available;
+                String unitLabel = item.isCapsuleTracked()
+                        ? (capsuleSale ? "capsule(s)" : "strip(s)") : "unit(s)";
+                throw new InsufficientStockException(item.getName(), availableDisplay, unitLabel);
+            }
+
+            BigDecimal unitPrice = capsuleSale
+                    ? item.getPrice().divide(BigDecimal.valueOf(item.getCapsulesPerStrip()), 2, RoundingMode.HALF_UP)
+                    : item.getPrice();
             BigDecimal offerPrice = unitPrice.multiply(discountMultiplier)
                     .divide(BigDecimal.valueOf(100), 2, RoundingMode.HALF_UP);
-            subtotal = subtotal.add(unitPrice.multiply(BigDecimal.valueOf(quantity)));
-            offerTotal = offerTotal.add(offerPrice.multiply(BigDecimal.valueOf(quantity)));
+            BigDecimal lineTotal = unitPrice.multiply(BigDecimal.valueOf(quantity));
+            BigDecimal lineOfferTotal = offerPrice.multiply(BigDecimal.valueOf(quantity));
+            BigDecimal lineCgst = taxAmount(lineOfferTotal);
+            BigDecimal lineSgst = taxAmount(lineOfferTotal);
+            subtotal = subtotal.add(lineTotal);
+            offerTotal = offerTotal.add(lineOfferTotal);
+            cgstTotal = cgstTotal.add(lineCgst);
+            sgstTotal = sgstTotal.add(lineSgst);
             totalQuantity += quantity;
-            orderItems.add(new OrderHistoryItem(item.getId(), item.getName(), quantity, unitPrice, offerPrice));
-            item.reduceQuantity(quantity);
+            int snapshotPackSize = item.isCapsuleTracked() ? item.getCapsulesPerStrip() : 1;
+            orderItems.add(new OrderHistoryItem(item.getId(), item.getName(), item.getMfgName(), item.getBatchNumber(),
+                    item.getExpireDate(), item.isScheduleH1(), quantity, unitPrice, offerPrice, saleUnit, snapshotPackSize));
+            if (item.isCapsuleTracked()) item.reduceCapsuleQuantity(stockToConsume);
+            else item.reduceQuantity(quantity);
         }
 
         OrderHistory order = new OrderHistory(
@@ -77,11 +107,19 @@ public class CheckoutService {
                 .map(item -> new OrderItemResponse(
                         item.getItemId(),
                         item.getItemName(),
+                        item.getMfgName(),
+                        item.getBatchNumber(),
+                        item.getExpireDate(),
+                        item.isScheduleH1(),
                         item.getQuantity(),
                         item.getUnitPrice(),
                         item.getOfferPrice(),
                         item.getUnitPrice().multiply(BigDecimal.valueOf(item.getQuantity())),
-                        item.getOfferPrice().multiply(BigDecimal.valueOf(item.getQuantity()))))
+                        item.getOfferPrice().multiply(BigDecimal.valueOf(item.getQuantity())),
+                        taxAmount(item.getOfferPrice().multiply(BigDecimal.valueOf(item.getQuantity()))),
+                        taxAmount(item.getOfferPrice().multiply(BigDecimal.valueOf(item.getQuantity()))),
+                        item.getSaleUnit(),
+                        item.getCapsulesPerStrip()))
                 .toList();
 
         return new OrderResponse(
@@ -94,6 +132,15 @@ public class CheckoutService {
                 savedOrder.getTotalQuantity(),
                 savedOrder.getTotalPrice(),
                 savedOrder.getTotalOfferPrice(),
+                                cgstTotal,
+                                sgstTotal,
+                                offerTotal.add(cgstTotal).add(sgstTotal),
                 responseItems);
     }
+
+        private BigDecimal taxAmount(BigDecimal taxableAmount) {
+                return taxableAmount.multiply(new BigDecimal("0.025")).setScale(2, RoundingMode.HALF_UP);
+        }
+
+    private record SaleLine(Long itemId, String saleUnit) { }
 }

@@ -8,22 +8,28 @@ export type ItemFormMode = 'add' | 'update';
 
 export interface ItemFormData {
   name: string;
+  mfgName: string;
   serialNumber: string;
   batchNumber: string;
   description: string;
   price: string;
   quantity: string;
+  capsulesPerStrip: string;
+  scheduleH1: boolean;
   category: string;
   expireDate: string;
 }
 
 const EMPTY_FORM: ItemFormData = {
   name: '',
+  mfgName: '',
   serialNumber: '',
   batchNumber: '',
   description: '',
   price: '',
   quantity: '',
+  capsulesPerStrip: '',
+  scheduleH1: false,
   category: '',
   expireDate: '',
 };
@@ -50,11 +56,14 @@ export class ItemFormComponent implements OnInit {
     this.form = item
       ? {
           name: item.name,
+          mfgName: item.mfgName || '',
           serialNumber: item.serialNumber,
           batchNumber: item.batchNumber || '',
           description: item.description || '',
           price: String(item.price),
           quantity: String(item.quantity),
+          capsulesPerStrip: item.capsulesPerStrip ? String(item.capsulesPerStrip) : '',
+          scheduleH1: item.scheduleH1 ?? false,
           category: item.category || '',
           expireDate: item.expireDate || '',
         }

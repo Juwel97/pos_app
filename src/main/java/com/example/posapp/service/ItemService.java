@@ -24,15 +24,25 @@ public class ItemService {
     }
 
     public Item add(ItemRequest request) {
-        return save(new Item(request.name().trim(), request.serialNumber().trim(), request.batchNumber(), request.description(),
-            request.price(), request.quantity(), request.category(), request.expireDate()));
+        Item item = new Item(request.name().trim(), request.serialNumber().trim(), request.batchNumber(), request.description(),
+            request.price(), request.quantity(), request.category(), request.expireDate(), request.mfgName(),
+            Boolean.TRUE.equals(request.scheduleH1()));
+        item.configureCapsuleStock(request.capsulesPerStrip(), capsuleStock(request));
+        return save(item);
     }
 
     public Item update(Long id, ItemRequest request) {
         Item item = repository.findById(id).orElseThrow(() -> new ItemNotFoundException(id));
-        item.update(request.name().trim(), request.serialNumber().trim(), request.batchNumber(), request.description(),
-            request.price(), request.quantity(), request.category(), request.expireDate());
+        int existingLooseCapsules = item.isCapsuleTracked() ? item.getLooseCapsules() : 0;
+        item.update(request.name().trim(), request.mfgName(), request.serialNumber().trim(), request.batchNumber(), request.description(),
+            request.price(), request.quantity(), request.category(), request.expireDate(), Boolean.TRUE.equals(request.scheduleH1()));
+        int capsuleQuantity = Math.addExact(capsuleStock(request), existingLooseCapsules);
+        item.configureCapsuleStock(request.capsulesPerStrip(), capsuleQuantity);
         return save(item);
+    }
+
+    private int capsuleStock(ItemRequest request) {
+        return Math.multiplyExact(request.quantity(), request.capsulesPerStrip());
     }
 
     @Transactional(readOnly = true)
