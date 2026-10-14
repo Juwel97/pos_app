@@ -114,6 +114,7 @@
 }
 
 .item-form input,
+.item-form select,
 .item-form textarea {
   border: 1px solid #e6e6ee;
   border-radius: 7px;
@@ -128,9 +129,24 @@
 }
 
 .item-form input:focus,
+.item-form select:focus,
 .item-form textarea:focus {
   border-color: #897bed;
   box-shadow: 0 0 0 3px #7565df19;
+}
+
+.item-form select {
+  appearance: none;
+  padding-right: 34px;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #85879a 50%),
+    linear-gradient(135deg, #85879a 50%, transparent 50%);
+  background-position:
+    calc(100% - 15px) 50%,
+    calc(100% - 11px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  cursor: pointer;
 }
 
 .item-form input::placeholder,

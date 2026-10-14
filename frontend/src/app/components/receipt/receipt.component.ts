@@ -65,9 +65,10 @@ export class ReceiptComponent {
       summary[unit] = (summary[unit] ?? 0) + item.quantity;
       return summary;
     }, {});
-    return Object.entries(totals)
+    const summary = Object.entries(totals)
       .map(([unit, quantity]) => `${quantity} ${unit === 'CAPSULE' ? 'capsule(s)' : 'strip(s)'}`)
       .join(' + ');
+    return `Total: ${summary}`;
   }
 
   lineCgst(item: ReceiptItem): number {

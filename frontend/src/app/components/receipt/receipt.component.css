@@ -160,6 +160,15 @@
   font-weight: 800;
 }
 
+.receipt-table tfoot .quantity-summary {
+  text-align: left;
+  white-space: nowrap;
+}
+
+.receipt-table tfoot .number-column {
+  white-space: nowrap;
+}
+
 .receipt-table tfoot th {
   text-align: left;
 }

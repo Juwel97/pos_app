@@ -60,6 +60,7 @@
               <th>BATCH NO</th>
               <th>EXP DATE</th>
               <th>SCHEDULE H1</th>
+              <th class="sale-unit-cell">SALE UNIT</th>
               <th>ITEM QUANTITY</th>
               <th>ACTUAL PRICE</th>
               <th>OFFER PRICE</th>
@@ -80,10 +81,10 @@
                 <td class="metadata-cell">{{ item.batchNumber || '-' }}</td>
                 <td class="metadata-cell">{{ item.expireDate ? (item.expireDate | date: 'MMM y') : '-' }}</td>
                 <td class="metadata-cell">{{ item.scheduleH1 ? 'Yes' : 'No' }}</td>
-                <td>
+                <td class="sale-unit-cell">
                   @if (item.capsulesPerStrip) {
                     <select
-                      class="quantity-input"
+                      class="sale-unit-select"
                       [ngModel]="item.saleUnit"
                       (ngModelChange)="cart.setSaleUnit(item.itemId, $event)"
                       [name]="'unit-' + item.itemId"
@@ -92,7 +93,13 @@
                       <option value="STRIP" [disabled]="item.stripStock < 1">Strip</option>
                       <option value="CAPSULE" [disabled]="item.capsuleStock < 1">Capsule</option>
                     </select>
+                  } @else {
+                    <span class="sale-unit-label">
+                      {{ item.saleUnit === 'CAPSULE' ? 'Capsule' : 'Strip' }}
+                    </span>
                   }
+                </td>
+                <td>
                   <div class="quantity-controls">
                     <input
                       class="quantity-input"
@@ -141,8 +148,8 @@
           </tbody>
           <tfoot>
             <tr>
-              <th colspan="6">Total</th>
-              <td class="total-quantity">{{ quantitySummary }}</td>
+              <td class="total-quantity" colspan="7">Total: {{ quantitySummary }}</td>
+              <td></td>
               <td class="total-price">{{ money.format(totalPrice) }}</td>
               <td class="total-offer">{{ money.format(totalOfferPrice) }}</td>
               <td>{{ money.format(totalCgst) }}</td>
