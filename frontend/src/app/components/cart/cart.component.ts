@@ -67,11 +67,13 @@ export class CartComponent {
 
   get quantitySummary(): string {
     const totals = this.cart.items().reduce<Record<string, number>>((summary, item) => {
-      summary[item.saleUnit] = (summary[item.saleUnit] ?? 0) + item.quantity;
+      const unit =
+        item.saleUnit === 'CAPSULE' ? 'capsule' : item.capsulesPerStrip ? 'strip' : 'unit';
+      summary[unit] = (summary[unit] ?? 0) + item.quantity;
       return summary;
     }, {});
     return Object.entries(totals)
-      .map(([unit, quantity]) => `${quantity} ${unit === 'CAPSULE' ? 'capsule(s)' : 'strip(s)/unit(s)'}`)
+      .map(([unit, quantity]) => `${quantity} ${unit}${quantity === 1 ? '' : 's'}`)
       .join(' + ');
   }
 

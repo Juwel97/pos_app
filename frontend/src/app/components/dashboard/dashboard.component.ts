@@ -169,7 +169,8 @@ export class DashboardComponent implements OnInit {
       return;
     }
     const saleUnit = capsuleTracked && stripStock === 0 ? 'CAPSULE' : 'STRIP';
-    this.cart.add({
+    const stock = saleUnit === 'CAPSULE' ? capsuleStock : stripStock;
+    const maximumReached = this.cart.add({
       itemId: item.id,
       name: item.name,
       mfgName: item.mfgName ?? null,
@@ -177,7 +178,7 @@ export class DashboardComponent implements OnInit {
       expireDate: item.expireDate ?? null,
       scheduleH1: item.scheduleH1 ?? false,
       quantity: 1,
-      stock: saleUnit === 'CAPSULE' ? capsuleStock : stripStock,
+      stock,
       stripStock,
       capsuleStock,
       capsulesPerStrip: packSize,
@@ -188,8 +189,8 @@ export class DashboardComponent implements OnInit {
         : Number(item.price),
     });
     this.showNotice(
-        saleUnit
-        ? `You have reached the maximum quantity of ${item.quantity} for ${item.name}.`
+      maximumReached
+        ? `You have reached the maximum quantity of ${stock} for ${item.name}.`
         : `${item.name} added to cart.`,
     );
   }

@@ -117,12 +117,13 @@
 }
 
 .cart-table-scroll {
-  overflow-x: auto;
+  overflow-x: hidden;
 }
 
 .cart-table {
   width: 100%;
-  min-width: 1320px;
+  min-width: 100%;
+  table-layout: fixed;
   border-collapse: collapse;
 }
 
@@ -132,26 +133,93 @@
 
 .cart-table th {
   height: 42px;
-  padding: 0 16px;
+  padding: 0 3px;
   border-bottom: 1px solid #ececf0;
   color: #888a98;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   text-align: left;
 }
 
+.cart-table th:nth-child(1),
+.cart-table td:nth-child(1) {
+  width: 4%;
+}
+
+.cart-table th:nth-child(2),
+.cart-table td:nth-child(2) {
+  width: 16%;
+}
+
+.cart-table th:nth-child(3),
+.cart-table td:nth-child(3),
+.cart-table th:nth-child(4),
+.cart-table td:nth-child(4) {
+  width: 6%;
+}
+
+.cart-table th:nth-child(5),
+.cart-table td:nth-child(5) {
+  width: 6%;
+}
+
+.cart-table th:nth-child(6),
+.cart-table td:nth-child(6) {
+  width: 7%;
+}
+
+.cart-table th:nth-child(7),
+.cart-table td:nth-child(7) {
+  width: 7.5%;
+}
+
+.cart-table th:nth-child(8),
+.cart-table td:nth-child(8) {
+  width: 10%;
+}
+
+.cart-table th:nth-child(n + 9):nth-child(-n + 12),
+.cart-table td:nth-child(n + 9):nth-child(-n + 12) {
+  width: 8.5%;
+}
+
+.cart-table th:nth-child(13),
+.cart-table td:nth-child(13) {
+  width: 3.5%;
+}
+
 .cart-table td {
   height: 66px;
-  padding: 10px 16px;
+  padding: 10px 3px;
   border-bottom: 1px solid #f0f0f3;
   color: #5c5e6c;
-  font-size: 12px;
-  white-space: nowrap;
+  font-size: 10px;
+  white-space: normal;
+  overflow-wrap: anywhere;
+}
+
+.cart-table th:nth-child(-n + 6),
+.cart-table td:nth-child(-n + 6) {
+  padding-right: 3px;
+  padding-left: 3px;
+}
+
+.cart-table th:first-child,
+.cart-table td:first-child {
+  padding-left: 16px;
+}
+
+.cart-table tbody td.serial-cell {
+  padding-left: 20px;
+}
+
+.cart-table th:last-child,
+.cart-table td:last-child {
+  padding-right: 14px;
 }
 
 .cart-table .serial-cell {
   color: #9698a4;
-  width: 72px;
 }
 
 .name-cell strong,
@@ -160,7 +228,8 @@
 }
 
 .name-cell {
-  min-width: 210px;
+  min-width: 0;
+  max-width: none;
   white-space: normal !important;
 }
 
@@ -176,10 +245,17 @@
 }
 
 .metadata-cell {
-  min-width: 90px;
+  min-width: 0;
+  max-width: none;
   color: #777a87;
   font-size: 11px;
   white-space: normal !important;
+  overflow-wrap: anywhere;
+}
+
+.sale-unit-cell {
+  padding-right: 2px !important;
+  padding-left: 2px !important;
 }
 
 .cart-payable {
@@ -190,25 +266,52 @@
 }
 
 .quantity-input {
-  width: 54px;
-  height: 32px;
-  padding: 0 8px;
+  width: 34px;
+  height: 30px;
+  padding: 0 2px;
   border: 1px solid #e5e5eb;
   border-radius: 6px;
   color: #3e4050;
   text-align: center;
 }
 
-.cart-table select.quantity-input {
+.sale-unit-select {
   display: block;
-  width: 88px;
-  margin-bottom: 5px;
+  width: 100%;
+  min-width: 0;
+  height: 30px;
+  padding: 0 14px 0 3px;
+  appearance: none;
+  border: 1px solid #e5e5eb;
+  border-radius: 6px;
+  background-color: #fff;
+  background-image:
+    linear-gradient(45deg, transparent 50%, #85879a 50%),
+    linear-gradient(135deg, #85879a 50%, transparent 50%);
+  background-position:
+    calc(100% - 7px) 50%,
+    calc(100% - 3px) 50%;
+  background-repeat: no-repeat;
+  background-size: 4px 4px;
+  color: #3e4050;
+  font: inherit;
+  cursor: pointer;
+}
+
+.sale-unit-select:focus {
+  border-color: #8c7ff0;
+  outline: 2px solid #8c7ff033;
+}
+
+.sale-unit-label {
+  color: #5c5e6c;
+  font-size: 11px;
 }
 
 .quantity-controls {
   display: inline-flex;
   align-items: center;
-  gap: 4px;
+  gap: 2px;
 }
 
 .quantity-input::-webkit-inner-spin-button,
@@ -228,7 +331,7 @@
 }
 
 .quantity-step-button {
-  width: 20px;
+  width: 14px;
   height: 15px;
   padding: 0;
   border: 1px solid #e5e5eb;
@@ -267,6 +370,10 @@
   color: #9294a0;
 }
 
+.cart-table .remove-button {
+  width: 24px;
+}
+
 .remove-button:hover {
   background: #fff0f1;
   color: #d75b69;
@@ -281,6 +388,10 @@
   color: #343645;
   font-size: 12px;
   font-weight: 700;
+}
+
+.cart-table tfoot .total-quantity {
+  white-space: nowrap;
 }
 
 .cart-table tfoot th {
@@ -459,8 +570,8 @@
 }
 
 .receipt-dialog {
-  width: min(520px, 100%);
-  padding: 24px;
+  width: min(1000px, calc(100vw - 40px));
+  padding: 28px;
 }
 
 .receipt-actions {

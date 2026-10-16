@@ -35,7 +35,8 @@ button {
 
 @media print {
   @page {
-    margin: 0;
+    size: A4 landscape;
+    margin: 10mm;
   }
 
   body * {
@@ -48,12 +49,31 @@ button {
   }
 
   .receipt-print {
-    position: fixed;
-    inset: 0;
+    position: static !important;
     width: 100%;
-    padding: 24px;
+    padding: 0;
     color: #111;
     background: #fff;
+  }
+
+  .receipt-backdrop,
+  .receipt-dialog,
+  .receipt-dialog app-receipt {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    background: #fff !important;
+    box-shadow: none !important;
+    visibility: visible !important;
+  }
+
+  .receipt-backdrop {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
   }
 
   .receipt-actions {
