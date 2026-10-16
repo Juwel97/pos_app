@@ -70,6 +70,12 @@ button {
     visibility: visible !important;
   }
 
+  .receipt-backdrop {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+  }
+
   .receipt-actions {
     display: none !important;
   }
