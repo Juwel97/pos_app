@@ -35,7 +35,8 @@ button {
 
 @media print {
   @page {
-    margin: 0;
+    size: A4 landscape;
+    margin: 10mm;
   }
 
   body * {
@@ -50,7 +51,7 @@ button {
   .receipt-print {
     position: static !important;
     width: 100%;
-    padding: 12mm;
+    padding: 0;
     color: #111;
     background: #fff;
   }

@@ -195,10 +195,9 @@
 
 @media print {
   .receipt-print {
-    position: fixed;
-    inset: 0;
+    position: static;
     width: 100%;
-    padding: 12mm;
+    padding: 0;
     color: #111;
     background: #fff;
     font-family: Arial, sans-serif;
@@ -206,5 +205,25 @@
 
   .receipt-table-wrap {
     overflow: visible;
+  }
+
+  .receipt-table {
+    width: 100%;
+    min-width: 0;
+    font-size: 9px;
+  }
+
+  .receipt-table th,
+  .receipt-table td {
+    padding: 4px 3px;
+    overflow-wrap: anywhere;
+  }
+
+  .receipt-table thead {
+    display: table-header-group;
+  }
+
+  .receipt-table tr {
+    break-inside: avoid;
   }
 }
